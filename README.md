@@ -45,7 +45,7 @@ FinControl
 1. Clone o repositório:
 
    ```bash
-   git clone <[url-do-repositorio](https://github.com/nathaliadebellis/FinControl.git)>
+   git clone https://github.com/nathaliagomes/FinControl.git
    ```
 
 2. Abra a solução no Visual Studio.
