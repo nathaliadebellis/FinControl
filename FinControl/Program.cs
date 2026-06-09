@@ -1,12 +1,53 @@
 ﻿using FinControl.Models;
-using System;
-using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
+string caminhoArquivo = Path.Combine(
+    AppDomain.CurrentDomain.BaseDirectory,
+    "Data",
+    "transacoes.json");
 
 List<Transacao> transacoes = new List<Transacao>();
 
+int proximoId = 1;
+
 bool executarSistema = true;
+
+void SalvarTransacoes()
+{
+    Directory.CreateDirectory(
+        Path.GetDirectoryName(caminhoArquivo)!
+    );
+
+    string json = JsonSerializer.Serialize(
+        transacoes,
+        new JsonSerializerOptions
+        {
+            WriteIndented = true
+        });
+
+    File.WriteAllText(caminhoArquivo, json);
+}
+
+void CarregarTransacoes()
+{
+    string pasta = Path.GetDirectoryName(caminhoArquivo)!;
+
+    Directory.CreateDirectory(pasta);
+
+    if (File.Exists(caminhoArquivo))
+    {
+        string json = File.ReadAllText(caminhoArquivo);
+
+        transacoes = JsonSerializer.Deserialize<List<Transacao>>(json)
+                     ?? new List<Transacao>();
+    }
+}
+
+CarregarTransacoes();
+    if (transacoes.Count > 0)
+{
+    proximoId = transacoes.Max(t => t.Id) + 1;
+}
 
 while (executarSistema)
 {
@@ -17,10 +58,11 @@ while (executarSistema)
     Console.WriteLine("1 - Adicionar Transação");
     Console.WriteLine("2 - Listar Transações");
     Console.WriteLine("3 - Ver Saldo Atual");
-    Console.WriteLine("4 - Editar Transação");
-    Console.WriteLine("5 - Excluir Transação");
-    Console.WriteLine("6 - Relatório Financeiro");
-    Console.WriteLine("7 - Sair");
+    Console.WriteLine("4 - Buscar Transação");
+    Console.WriteLine("5 - Editar Transação");
+    Console.WriteLine("6 - Excluir Transação");
+    Console.WriteLine("7 - Relatório Financeiro");
+    Console.WriteLine("8 - Sair");
     string opcao = Console.ReadLine();
 
     switch (opcao)
@@ -38,19 +80,23 @@ while (executarSistema)
             break;
 
         case "4":
+            BuscarTransacao();
+            break;
+
+        case "5":
             EditarTransacao();
             break;
 
 
-        case "5":
+        case "6":
             ExcluirTransacao();
             break;
 
-        case "6":
+        case "7":
             RelatorioFinanceiro();
             break;
 
-        case "7":
+        case "8":
             Console.WriteLine("Obrigado por utilizar o FinControl!");
             executarSistema = false;
             break;
@@ -63,6 +109,10 @@ while (executarSistema)
     void CadastrarTransacao()
     {
         Transacao transacao = new Transacao();
+
+        transacao.Id = proximoId++;
+
+        transacao.Date = DateTime.Now;
 
         Console.WriteLine("Digite a descrição:");
         transacao.Description = Console.ReadLine();
@@ -117,6 +167,8 @@ while (executarSistema)
 
         transacoes.Add(transacao);
 
+        SalvarTransacoes();
+
         Console.WriteLine("Transação cadastrada com sucesso!");
     }
 
@@ -130,6 +182,8 @@ while (executarSistema)
 
         foreach (var item in transacoes)
         {
+            Console.WriteLine($"ID: {item.Id}");
+            Console.WriteLine($"Data: {item.Date:dd/MM/yyyy HH:mm}");
             Console.WriteLine($"Descrição: {item.Description}");
             Console.WriteLine($"Categoria: {item.Category}");
             Console.WriteLine($"Tipo: {item.Type}");
@@ -154,6 +208,31 @@ while (executarSistema)
         }
 
     Console.WriteLine($"Saldo atual: R$ {saldo}");
+    }
+
+    void BuscarTransacao()
+    {
+        Console.WriteLine("Digite a descrição da transação que deseja buscar:");
+        string descricaoBuscar = Console.ReadLine();
+        bool encontrou = false;
+        foreach (var item in transacoes)
+        {
+           if (item.Description.ToUpper().Contains(descricaoBuscar.ToUpper()))
+            {
+                Console.WriteLine($"ID: {item.Id}");
+                Console.WriteLine($"Data: {item.Date:dd/MM/yyyy HH:mm}");
+                Console.WriteLine($"Descrição: {item.Description}");
+                Console.WriteLine($"Categoria: {item.Category}");
+                Console.WriteLine($"Tipo: {item.Type}");
+                Console.WriteLine($"Valor: R$ {item.Value}");
+                Console.WriteLine("--------------------");
+                encontrou = true;
+            }
+        }
+        if (!encontrou)
+        {
+            Console.WriteLine("Transação não encontrada.");
+        }
     }
 
     void EditarTransacao()
@@ -209,6 +288,7 @@ while (executarSistema)
                 }
                 item.Value = valor;
                 encontrou = true;
+                SalvarTransacoes();
                 Console.WriteLine("Transação editada com sucesso!");
                 break;
             }
@@ -232,6 +312,7 @@ while (executarSistema)
             {
                 transacoes.Remove(item);
                 encontrou = true;
+                SalvarTransacoes();
 
                 Console.WriteLine("Transação removida com sucesso!");
                 break;
