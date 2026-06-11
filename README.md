@@ -1,63 +1,104 @@
-# FinControl
+# FinControl 💰
 
-FinControl é um sistema de gestão financeira pessoal desenvolvido em C# como projeto de estudos. O objetivo é auxiliar no controle de receitas e despesas por meio de uma aplicação de console simples e intuitiva.
+Sistema de gestão financeira pessoal desenvolvido em C# para controle de receitas, despesas e análise financeira.
 
-## Funcionalidades
+## 📌 Sobre o Projeto
 
-* Adicionar transações financeiras
-* Listar transações cadastradas
-* Calcular saldo atual
-* Editar transações
-* Excluir transações
-* Validação de entradas do usuário
+O FinControl foi desenvolvido como projeto de estudos para praticar conceitos fundamentais de desenvolvimento de software utilizando C# e .NET.
 
-## Tecnologias Utilizadas
+A aplicação permite registrar movimentações financeiras, acompanhar o saldo, organizar despesas por categorias e gerar relatórios detalhados para diferentes períodos.
+
+## 🚀 Funcionalidades
+
+### Gerenciamento de Transações
+
+* Cadastro de receitas e despesas
+* Edição de transações
+* Exclusão de transações
+* Busca de transações por descrição
+* Categorias pré-definidas
+* Registro automático de data e hora
+* Identificador único para cada transação
+
+### Controle Financeiro
+
+* Visualização do saldo atual
+* Cálculo automático de receitas
+* Cálculo automático de despesas
+
+### Relatórios Financeiros
+
+* Relatório Geral
+* Relatório Mensal
+* Relatório Anual
+* Relatório Personalizado por período
+* Análise de gastos por categoria
+* Ordenação das transações por data
+
+### Persistência de Dados
+
+* Armazenamento em arquivo JSON
+* Carregamento automático dos dados ao iniciar o sistema
+* Salvamento automático após alterações
+
+## 🛠️ Tecnologias Utilizadas
 
 * C#
 * .NET
-* Visual Studio
-* Git e GitHub
-
-## Conceitos Aplicados
-
+* LINQ
+* System.Text.Json
 * Programação Orientada a Objetos (POO)
-* Classes e Objetos
-* Métodos
-* Listas (`List<T>`)
-* Estruturas de decisão (`if`, `else`, `switch`)
-* Estruturas de repetição (`while`, `foreach`)
-* Validação de dados com `TryParse`
-* CRUD (Create, Read, Update e Delete)
 
-## Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
 ```text
 FinControl
-│
 ├── Models
 │   └── Transacao.cs
-│
+├── Services
+│   └── RelatorioService.cs
+├── Data
+│   └── transacoes.json
 └── Program.cs
 ```
 
-## Como Executar
+## 📊 Exemplo de Relatório
 
-1. Clone o repositório:
+```text
+====================================
+RELATÓRIO DE JUNHO DE 2026
+====================================
 
-   ```bash
-   git clone https://github.com/nathaliagomes/FinControl.git
-   ```
+Total de Receitas: R$ 3.000,00
+Total de Despesas: R$ 550,00
+Saldo Final: R$ 2.450,00
 
-2. Abra a solução no Visual Studio.
+=== GASTOS POR CATEGORIA ===
 
-3. Execute o projeto.
+Alimentação: R$ 500,00
+Transporte: R$ 50,00
+```
 
-## Próximas Melhorias
+## 📚 Conceitos Praticados
 
-* Relatório financeiro detalhado
-* Persistência de dados em JSON
-* Banco de dados
+Durante o desenvolvimento deste projeto foram aplicados conceitos como:
+
+* Estruturas de repetição
+* Estruturas condicionais
+* Métodos
+* Listas e coleções
+* Manipulação de arquivos
+* Serialização e desserialização JSON
+* LINQ
+* Organização em camadas
+* Validação de entrada de dados
+* Boas práticas de programação
+
+## 🔮 Próximas Melhorias
+
+* Dashboard financeiro inicial
+* Exportação para CSV
+* Banco de dados SQLite
+* Gráficos financeiros
 * Interface gráfica
-* Categorias personalizadas
-* Relatórios por período
-
+* Testes automatizados
