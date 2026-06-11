@@ -117,8 +117,35 @@ while (executarSistema)
         Console.WriteLine("Digite a descrição:");
         transacao.Description = Console.ReadLine();
 
-        Console.WriteLine("Digite a categoria:");
-        transacao.Category = Console.ReadLine();
+        Console.WriteLine("Escolha a categoria:");
+
+        for (int i = 0; i < Categorias.Lista.Count; i++)
+        {
+            Console.WriteLine($"{i + 1} - {Categorias.Lista[i]}");
+        }
+
+        int opcaoCategoria;
+        bool categoriaValida = false;
+
+        while (!categoriaValida)
+        {
+            categoriaValida = int.TryParse(
+                Console.ReadLine(),
+                out opcaoCategoria
+            );
+
+            if (categoriaValida &&
+                opcaoCategoria >= 1 &&
+                opcaoCategoria <= Categorias.Lista.Count)
+            {
+                transacao.Category = Categorias.Lista[opcaoCategoria - 1];
+            }
+            else
+            {
+                categoriaValida = false;
+                Console.WriteLine("Categoria inválida. Tente novamente.");
+            }
+        }
 
         Console.WriteLine("Digite o tipo:");
         Console.WriteLine("1 - Receita");
