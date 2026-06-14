@@ -2,6 +2,9 @@
 using FinControl.Services;
 using System.Text.Json;
 
+// Inicializa gerenciador de erros
+GerenciadorErros.Inicializar();
+
 string caminhoArquivo = Path.Combine(
     AppDomain.CurrentDomain.BaseDirectory,
     "Data",
@@ -15,34 +18,44 @@ bool executarSistema = true;
 
 void SalvarTransacoes()
 {
-    Directory.CreateDirectory(
-        Path.GetDirectoryName(caminhoArquivo)!
-    );
+    bool sucesso = GerenciadorErros.TratarSalvamentoDados(() =>
+    {
+        // Cria backup antes de salvar
+        GerenciadorErros.CriarBackup(caminhoArquivo);
 
-    string json = JsonSerializer.Serialize(
-        transacoes,
-        new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
+        Directory.CreateDirectory(Path.GetDirectoryName(caminhoArquivo)!);
 
-    File.WriteAllText(caminhoArquivo, json);
+        string json = JsonSerializer.Serialize(
+            transacoes,
+            new JsonSerializerOptions { WriteIndented = true });
+
+        File.WriteAllText(caminhoArquivo, json);
+    },
+    "Transações");
 }
 
 void CarregarTransacoes()
 {
-    string pasta = Path.GetDirectoryName(caminhoArquivo)!;
-
-    Directory.CreateDirectory(pasta);
-
-    if (File.Exists(caminhoArquivo))
+    transacoes = GerenciadorErros.TratarCarregamentoDados(() =>
     {
-        string json = File.ReadAllText(caminhoArquivo);
+        string pasta = Path.GetDirectoryName(caminhoArquivo)!;
+        Directory.CreateDirectory(pasta);
 
-        transacoes = JsonSerializer.Deserialize<List<Transacao>>(json)
-                     ?? new List<Transacao>();
-    }
+        if (File.Exists(caminhoArquivo))
+        {
+            string json = File.ReadAllText(caminhoArquivo);
+            return JsonSerializer.Deserialize<List<Transacao>>(json)
+                   ?? new List<Transacao>();
+        }
+
+        return new List<Transacao>();
+    },
+    "Transações",
+    new List<Transacao>()) ?? new List<Transacao>();
 }
+
+// Inicializa limpeza de backups antigos
+GerenciadorErros.LimparBackupsAntigos(caminhoArquivo, 30);
 
 CarregarTransacoes();
 if (transacoes.Count > 0)
@@ -52,8 +65,11 @@ if (transacoes.Count > 0)
 
 while (executarSistema)
 {
-    Console.WriteLine("Bem vindo ao FinControl!");
-    Console.WriteLine("Seu sistema de gestão financeira pessoal");
+    Console.Clear();
+    Console.WriteLine("╔════════════════════════════════════╗");
+    Console.WriteLine("║      BEM-VINDO AO FINCONTROL       ║");
+    Console.WriteLine("║  Seu sistema de gestão financeira  ║");
+    Console.WriteLine("╚════════════════════════════════════╝");
     Console.WriteLine();
     Console.WriteLine("Para continuar, escolha uma opção:");
     Console.WriteLine("1 - Adicionar Transação");
@@ -63,8 +79,12 @@ while (executarSistema)
     Console.WriteLine("5 - Editar Transação");
     Console.WriteLine("6 - Excluir Transação");
     Console.WriteLine("7 - Relatório Financeiro");
-    Console.WriteLine("8 - Sair");
-    string opcao = Console.ReadLine();
+    Console.WriteLine("8 - Backup e Recuperação");
+    Console.WriteLine("9 - Ver Erros Recentes");
+    Console.WriteLine("0 - Sair");
+    Console.WriteLine();
+
+    string opcao = ValidadorEntrada.LerOpcaoMenu(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" });
 
     switch (opcao)
     {
@@ -97,6 +117,14 @@ while (executarSistema)
             break;
 
         case "8":
+            MenuBackupRecuperacao();
+            break;
+
+        case "9":
+            GerenciadorErros.ExibirRelatorioDErros();
+            break;
+
+        case "0":
             Console.WriteLine("Obrigado por utilizar o FinControl!");
             executarSistema = false;
             break;
@@ -352,4 +380,242 @@ while (executarSistema)
         }
     }
 
+    void MenuBackupRecuperacao()
+    {
+        bool continuarMenu = true;
+
+        while (continuarMenu)
+        {
+            Console.Clear();
+            Console.WriteLine("╔════════════════════════════════════╗");
+            Console.WriteLine("║    BACKUP E RECUPERAÇÃO            ║");
+            Console.WriteLine("╚════════════════════════════════════╝");
+            Console.WriteLine();
+            Console.WriteLine("Escolha uma opção:");
+            Console.WriteLine("1 - Criar Backup Manual");
+            Console.WriteLine("2 - Listar Backups");
+            Console.WriteLine("3 - Restaurar do Backup");
+            Console.WriteLine("4 - Informações de Backup");
+            Console.WriteLine("0 - Voltar ao Menu Principal");
+            Console.WriteLine();
+
+            string opcaoBackup = ValidadorEntrada.LerOpcaoMenu(new[] { "1", "2", "3", "4", "0" });
+
+            switch (opcaoBackup)
+            {
+                case "1":
+                    CriarBackupManual();
+                    break;
+                case "2":
+                    ListarBackups();
+                    break;
+                case "3":
+                    RestaurarBackup();
+                    break;
+                case "4":
+                    ExibirInfoBackup();
+                    break;
+                case "0":
+                    continuarMenu = false;
+                    break;
+            }
+        }
+    }
+
+    void CriarBackupManual()
+    {
+        Console.Clear();
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine("     CRIAR BACKUP MANUAL           ");
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine();
+
+        bool sucesso = GerenciadorErros.CriarBackup(caminhoArquivo);
+
+        if (sucesso)
+        {
+            ValidadorEntrada.MostrarSucesso("Backup criado com sucesso!");
+        }
+        else
+        {
+            ValidadorEntrada.MostrarErro("Falha ao criar backup.");
+        }
+
+        Console.WriteLine("\nPressione ENTER para continuar...");
+        Console.ReadLine();
+    }
+
+    void ListarBackups()
+    {
+        Console.Clear();
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine("     BACKUPS DISPONÍVEIS           ");
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine();
+
+        string diretorioBackup = Path.Combine(
+            Path.GetDirectoryName(caminhoArquivo)!,
+            "backup");
+
+        if (!Directory.Exists(diretorioBackup))
+        {
+            ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
+            Console.WriteLine("\nPressione ENTER para continuar...");
+            Console.ReadLine();
+            return;
+        }
+
+        var arquivos = Directory.GetFiles(diretorioBackup, "*.json")
+            .OrderByDescending(f => File.GetLastWriteTime(f))
+            .ToList();
+
+        if (arquivos.Count == 0)
+        {
+            ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
+            Console.WriteLine("\nPressione ENTER para continuar...");
+            Console.ReadLine();
+            return;
+        }
+
+        for (int i = 0; i < arquivos.Count; i++)
+        {
+            FileInfo info = new FileInfo(arquivos[i]);
+            Console.WriteLine($"{i + 1}. {info.Name}");
+            Console.WriteLine($"   Data: {info.LastWriteTime:dd/MM/yyyy HH:mm:ss}");
+            Console.WriteLine($"   Tamanho: {(info.Length / 1024.0):F2} KB");
+            Console.WriteLine();
+        }
+
+        Console.WriteLine("Pressione ENTER para continuar...");
+        Console.ReadLine();
+    }
+
+    void RestaurarBackup()
+    {
+        Console.Clear();
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine("     RESTAURAR DO BACKUP           ");
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine();
+
+        string diretorioBackup = Path.Combine(
+            Path.GetDirectoryName(caminhoArquivo)!,
+            "backup");
+
+        if (!Directory.Exists(diretorioBackup))
+        {
+            ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
+            Console.WriteLine("\nPressione ENTER para continuar...");
+            Console.ReadLine();
+            return;
+        }
+
+        var arquivos = Directory.GetFiles(diretorioBackup, "*.json")
+            .OrderByDescending(f => File.GetLastWriteTime(f))
+            .ToList();
+
+        if (arquivos.Count == 0)
+        {
+            ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
+            Console.WriteLine("\nPressione ENTER para continuar...");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine("Backups disponíveis:");
+        for (int i = 0; i < arquivos.Count; i++)
+        {
+            FileInfo info = new FileInfo(arquivos[i]);
+            Console.WriteLine($"{i + 1}. {info.Name} ({info.LastWriteTime:dd/MM/yyyy HH:mm:ss})");
+        }
+
+        int escolha = ValidadorEntrada.LerInteiro("\nEscolha o número do backup:", 1, arquivos.Count);
+        string backupSelecionado = arquivos[escolha - 1];
+
+        Console.Write("\nDeseja realmente restaurar este backup? Isso sobrescreverá os dados atuais. (S/N): ");
+        string confirmacao = Console.ReadLine()?.ToUpper() ?? "N";
+
+        if (confirmacao != "S")
+        {
+            ValidadorEntrada.MostrarInfo("Restauração cancelada.");
+            Console.WriteLine("\nPressione ENTER para continuar...");
+            Console.ReadLine();
+            return;
+        }
+
+        try
+        {
+            // Cria backup dos dados atuais antes de restaurar
+            GerenciadorErros.CriarBackup(caminhoArquivo);
+
+            // Restaura do backup
+            File.Copy(backupSelecionado, caminhoArquivo, true);
+
+            // Recarrega transações
+            CarregarTransacoes();
+
+            ValidadorEntrada.MostrarSucesso("Backup restaurado com sucesso!");
+        }
+        catch (Exception ex)
+        {
+            ValidadorEntrada.MostrarErro($"Erro ao restaurar backup: {ex.Message}");
+        }
+
+        Console.WriteLine("\nPressione ENTER para continuar...");
+        Console.ReadLine();
+    }
+
+    void ExibirInfoBackup()
+    {
+        Console.Clear();
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine("     INFORMAÇÕES DE BACKUP         ");
+        Console.WriteLine("═══════════════════════════════════");
+        Console.WriteLine();
+
+        // Informações do arquivo principal
+        if (File.Exists(caminhoArquivo))
+        {
+            FileInfo info = new FileInfo(caminhoArquivo);
+            Console.WriteLine("Arquivo Principal:");
+            Console.WriteLine($"  Caminho: {caminhoArquivo}");
+            Console.WriteLine($"  Tamanho: {(info.Length / 1024.0):F2} KB");
+            Console.WriteLine($"  Última modificação: {info.LastWriteTime:dd/MM/yyyy HH:mm:ss}");
+            Console.WriteLine($"  Transações: {transacoes.Count}");
+        }
+
+        // Informações de backups
+        string diretorioBackup = Path.Combine(
+            Path.GetDirectoryName(caminhoArquivo)!,
+            "backup");
+
+        if (Directory.Exists(diretorioBackup))
+        {
+            var backups = Directory.GetFiles(diretorioBackup, "*.json");
+            Console.WriteLine();
+            Console.WriteLine($"Backups Disponíveis: {backups.Length}");
+
+            if (backups.Length > 0)
+            {
+                long tamanhoTotal = backups.Sum(f => new FileInfo(f).Length);
+                Console.WriteLine($"Tamanho Total: {(tamanhoTotal / 1024.0):F2} KB");
+
+                var mais_recente = backups
+                    .Select(f => new { Path = f, Info = new FileInfo(f) })
+                    .OrderByDescending(x => x.Info.LastWriteTime)
+                    .First();
+
+                Console.WriteLine($"Backup Mais Recente: {Path.GetFileName(mais_recente.Path)}");
+                Console.WriteLine($"  Data: {mais_recente.Info.LastWriteTime:dd/MM/yyyy HH:mm:ss}");
+            }
+        }
+        else
+        {
+            Console.WriteLine();
+            Console.WriteLine("Backups Disponíveis: 0");
+        }
+
+        Console.WriteLine("\nPressione ENTER para continuar...");
+        Console.ReadLine();
+    }
 }
