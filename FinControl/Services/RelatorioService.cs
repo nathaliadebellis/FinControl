@@ -17,7 +17,8 @@ public static class RelatorioService
             Console.WriteLine("2 - Relatório Mensal");
             Console.WriteLine("3 - Relatório Anual");
             Console.WriteLine("4 - Relatório Personalizado");
-            Console.WriteLine("5 - Voltar");
+            Console.WriteLine("5 - Busca Avançada");
+            Console.WriteLine("6 - Voltar");
 
             string opcao = Console.ReadLine();
 
@@ -40,6 +41,10 @@ public static class RelatorioService
                     break;
 
                 case "5":
+                    BuscaAvancada(transacoes);
+                    break;
+
+                case "6":
                     executandoRelatorio = false;
                     break;
 
@@ -48,8 +53,8 @@ public static class RelatorioService
                     break;
             }
         }
-
     }
+
     public static void RelatorioMensal(List<Transacao> transacoes)
     {
         int mes = 0;
@@ -433,5 +438,12 @@ public static class RelatorioService
                 Console.WriteLine($"{categoria}: R$ {totalCategoria:F2}");
             }
         }
+    }
+
+    public static void BuscaAvancada(List<Transacao> transacoes)
+    {
+        var filtro = BuscaTransacaoService.CriarFiltroInterativo();
+        var resultados = BuscaTransacaoService.BuscarComFiltros(transacoes, filtro);
+        BuscaTransacaoService.ExibirTransacoes(resultados);
     }
 }
