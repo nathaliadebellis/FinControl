@@ -129,6 +129,7 @@ public static class ValidadorEntrada
                 continue;
             }
 
+            //Se existe o valor digitado dentro do array de opções, retorna ele
             if (Array.Exists(opcoes, element => element == entrada))
             {
                 return entrada;

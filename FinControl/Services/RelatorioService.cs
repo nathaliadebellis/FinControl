@@ -115,11 +115,11 @@ public static class RelatorioService
             {
                 transacoesDoMes.Add(item);
 
-                if (item.Type == "Receita")
+                if (item.Type == TipoTransacao.Receita)
                 {
                     totalReceitas += item.Value;
                 }
-                else if (item.Type == "Despesa")
+                else if (item.Type == TipoTransacao.Despesa)
                 {
                     totalDespesas += item.Value;
                 }
@@ -192,11 +192,11 @@ public static class RelatorioService
             {
                 transacoesDoAno.Add(item);
 
-                if (item.Type == "Receita")
+                if (item.Type == TipoTransacao.Receita)
                 {
                     totalReceitas += item.Value;
                 }
-                else if (item.Type == "Despesa")
+                else if (item.Type == TipoTransacao.Despesa)
                 {
                     totalDespesas += item.Value;
                 }
@@ -330,11 +330,11 @@ public static class RelatorioService
             {
                 transacoesDoPeriodo.Add(item);
 
-                if (item.Type == "Receita")
+                if (item.Type == TipoTransacao.Receita)
                 {
                     totalReceitas += item.Value;
                 }
-                else if (item.Type == "Despesa")
+                else if (item.Type == TipoTransacao.Despesa)
                 {
                     totalDespesas += item.Value;
                 }
@@ -383,11 +383,11 @@ public static class RelatorioService
 
         foreach (var item in transacoes)
         {
-            if (item.Type == "Receita")
+            if (item.Type == TipoTransacao.Receita)
             {
                 totalReceitas += item.Value;
             }
-            else if (item.Type == "Despesa")
+            else if (item.Type == TipoTransacao.Despesa)
             {
                 totalDespesas += item.Value;
             }
@@ -422,7 +422,7 @@ public static class RelatorioService
             foreach (var item in transacoesFiltradas)
             {
                 if (item.Category == categoria &&
-                    item.Type == "Despesa")
+                    item.Type == TipoTransacao.Despesa)
                 {
                     totalCategoria += item.Value;
                 }

@@ -191,14 +191,7 @@ while (executarSistema)
             tipoOpcao = Console.ReadLine();
         }
 
-        if (tipoOpcao == "1")
-        {
-            transacao.Type = "Receita";
-        }
-        else
-        {
-            transacao.Type = "Despesa";
-        }
+        transacao.Type = tipoOpcao == "1" ? TipoTransacao.Receita : TipoTransacao.Despesa;
 
         decimal valor = 0;
         bool valorValido = false;
@@ -252,17 +245,17 @@ while (executarSistema)
         decimal saldo = 0;
         foreach (var item in transacoes)
         {
-            if (item.Type == "Receita")
+            if (item.Type == TipoTransacao.Receita)
             {
                 saldo += item.Value;
             }
-            else if (item.Type == "Despesa")
+            else if (item.Type == TipoTransacao.Despesa)
             {
                 saldo -= item.Value;
             }
         }
 
-        Console.WriteLine($"Saldo atual: R$ {saldo}");
+        Console.WriteLine($"Saldo atual: R$ {saldo:F2}");
     }
 
     void BuscarTransacao()
@@ -319,14 +312,7 @@ while (executarSistema)
                     Console.WriteLine("2 - Despesa");
                     tipoOpcao = Console.ReadLine();
                 }
-                if (tipoOpcao == "1")
-                {
-                    item.Type = "Receita";
-                }
-                else
-                {
-                    item.Type = "Despesa";
-                }
+                item.Type = tipoOpcao == "1" ? TipoTransacao.Receita : TipoTransacao.Despesa;
                 decimal valor = 0;
                 bool valorValido = false;
                 while (!valorValido)
