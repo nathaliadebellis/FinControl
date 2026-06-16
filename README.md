@@ -1,45 +1,69 @@
-# FinControl 💰
+# 💰 FinControl
 
-Sistema de gestão financeira pessoal desenvolvido em C# para controle de receitas, despesas e análise financeira.
+FinControl é uma aplicação de console desenvolvida em C# e .NET para gerenciamento de finanças pessoais. O sistema permite registrar receitas e despesas, categorizar movimentações, acompanhar o saldo financeiro, gerar relatórios detalhados e manter os dados protegidos por meio de um sistema de backup e recuperação.
+
+Projeto desenvolvido com foco no aprendizado de Programação Orientada a Objetos (POO), LINQ, serialização JSON, tratamento de exceções, validação de dados e boas práticas de desenvolvimento com .NET.
+
+---
 
 ## 📌 Sobre o Projeto
 
-O FinControl foi desenvolvido como projeto de estudos para praticar conceitos fundamentais de desenvolvimento de software utilizando C# e .NET.
+O FinControl foi criado para simular um sistema de controle financeiro capaz de auxiliar no gerenciamento de receitas e despesas de forma simples e organizada.
 
-A aplicação permite registrar movimentações financeiras, acompanhar o saldo, organizar despesas por categorias e gerar relatórios detalhados para diferentes períodos.
+Além das operações básicas de cadastro, edição e exclusão de transações, o projeto implementa recursos de confiabilidade como backup automático, restauração de dados, tratamento centralizado de erros e persistência em arquivos JSON.
+
+---
 
 ## 🚀 Funcionalidades
 
-### Gerenciamento de Transações
+### 📝 Gerenciamento de Transações
 
 * Cadastro de receitas e despesas
-* Edição de transações
+* Edição de transações existentes
 * Exclusão de transações
 * Busca de transações por descrição
-* Categorias pré-definidas
+* Categorização das movimentações financeiras
 * Registro automático de data e hora
-* Identificador único para cada transação
+* Geração de identificadores únicos para cada transação
 
-### Controle Financeiro
+### 💵 Controle Financeiro
 
-* Visualização do saldo atual
-* Cálculo automático de receitas
-* Cálculo automático de despesas
+* Exibição do saldo atual
+* Cálculo automático de receitas e despesas
+* Atualização dinâmica do saldo com base nas movimentações cadastradas
 
-### Relatórios Financeiros
+### 📊 Relatórios 
 
-* Relatório Geral
-* Relatório Mensal
-* Relatório Anual
-* Relatório Personalizado por período
+* Relatório financeiro geral
+* Relatório mensal
+* Relatório anual
+* Relatório personalizado por período
 * Análise de gastos por categoria
 * Ordenação das transações por data
 
-### Persistência de Dados
+### 💾 Persistência de Dados
 
 * Armazenamento em arquivo JSON
-* Carregamento automático dos dados ao iniciar o sistema
+* Carregamento automático dos dados ao iniciar a aplicação
 * Salvamento automático após alterações
+
+### 🛡️ Backup e Recuperação
+
+* Criação automática de backup antes de salvar os dados
+* Criação manual de backups
+* Listagem dos backups disponíveis
+* Restauração completa dos dados a partir de backups
+* Limpeza automática de backups antigos
+* Exibição de informações sobre os backups armazenados
+
+### ⚠️ Tratamento de Erros
+
+* Gerenciamento centralizado de exceções
+* Registro de erros em log
+* Consulta aos erros recentes
+* Validação das entradas do usuário
+
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -48,19 +72,60 @@ A aplicação permite registrar movimentações financeiras, acompanhar o saldo,
 * LINQ
 * System.Text.Json
 * Programação Orientada a Objetos (POO)
+* Manipulação de Arquivos
+* Tratamento de Exceções
+
+---
 
 ## 📂 Estrutura do Projeto
 
 ```text
-FinControl
-├── Models
-│   └── Transacao.cs
-├── Services
-│   └── RelatorioService.cs
-├── Data
+FinControl/
+├── Data/
 │   └── transacoes.json
+│
+├── Models/
+│   ├── Categorias.cs
+│   ├── FiltroTransacao.cs
+│   ├── TipoTransacao.cs
+│   └── Transacao.cs
+│
+├── Services/
+│   ├── BuscaTransacaoService.cs
+│   ├── ExcecoesCustomizadas.cs
+│   ├── Formatting.cs
+│   ├── GerenciadorErros.cs
+│   ├── LoggerArquivos.cs
+│   ├── RelatorioService.cs
+│   └── ValidadorEntrada.cs
+│
 └── Program.cs
 ```
+
+
+---
+
+## ▶️ Como Executar
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/nathaliadebellis/FinControl.git
+```
+
+2. Acesse a pasta do projeto:
+
+```bash
+cd FinControl
+```
+
+3. Execute a aplicação:
+
+```bash
+dotnet run
+```
+
+---
 
 ## 📊 Exemplo de Relatório
 
@@ -71,6 +136,7 @@ RELATÓRIO DE JUNHO DE 2026
 
 Total de Receitas: R$ 3.000,00
 Total de Despesas: R$ 550,00
+
 Saldo Final: R$ 2.450,00
 
 === GASTOS POR CATEGORIA ===
@@ -79,26 +145,36 @@ Alimentação: R$ 500,00
 Transporte: R$ 50,00
 ```
 
-## 📚 Conceitos Praticados
+---
+
+## 📚 Conceitos Aplicados
 
 Durante o desenvolvimento deste projeto foram aplicados conceitos como:
 
-* Estruturas de repetição
-* Estruturas condicionais
-* Métodos
-* Listas e coleções
-* Manipulação de arquivos
-* Serialização e desserialização JSON
-* LINQ
+* Programação Orientada a Objetos (POO)
+* Estruturas condicionais e de repetição
+* Métodos e modularização
 * Organização em camadas
+* Manipulação de listas e coleções
+* Consultas utilizando LINQ
+* Serialização e desserialização JSON
+* Manipulação de arquivos
+* Tratamento de exceções
+* Logging de erros
 * Validação de entrada de dados
-* Boas práticas de programação
+* Persistência de informações
+* Backup e recuperação de dados
+
+---
 
 ## 🔮 Próximas Melhorias
 
-* Dashboard financeiro inicial
-* Exportação para CSV
-* Banco de dados SQLite
-* Gráficos financeiros
-* Interface gráfica
-* Testes automatizados
+- Dashboard financeiro
+- Exportação de relatórios para CSV
+- Persistência utilizando SQLite
+- Interface gráfica (WPF, WinForms ou Blazor)
+- Testes automatizados
+- Injeção de Dependência (Dependency Injection)
+- Arquitetura baseada em interfaces
+
+---
