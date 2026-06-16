@@ -170,7 +170,7 @@ public static class BuscaTransacaoService
     {
         if (transacoes.Count == 0)
         {
-            Console.WriteLine("\n❌ Nenhuma transação encontrada com os filtros aplicados.\n");
+            Console.WriteLine("\n Nenhuma transação encontrada com os filtros aplicados.\n");
             return;
         }
 

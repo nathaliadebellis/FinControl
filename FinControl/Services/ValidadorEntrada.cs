@@ -21,7 +21,7 @@ public static class ValidadorEntrada
             if (string.IsNullOrWhiteSpace(entrada))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ Campo obrigatório! Não pode estar vazio.");
+                Console.WriteLine("Campo obrigatório! Não pode estar vazio.");
                 Console.ResetColor();
                 continue;
             }
@@ -43,7 +43,7 @@ public static class ValidadorEntrada
             if (string.IsNullOrWhiteSpace(entrada))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ Campo obrigatório! Digite um número.");
+                Console.WriteLine("Campo obrigatório! Digite um número.");
                 Console.ResetColor();
                 continue;
             }
@@ -51,7 +51,7 @@ public static class ValidadorEntrada
             if (!int.TryParse(entrada, out int valor))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ Entrada inválida! Digite um número inteiro.");
+                Console.WriteLine($"Entrada inválida! Digite um número inteiro.");
                 Console.ResetColor();
                 continue;
             }
@@ -59,7 +59,7 @@ public static class ValidadorEntrada
             if (valor < minimo || valor > maximo)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ Valor fora do intervalo permitido ({minimo} a {maximo}).");
+                Console.WriteLine($"Valor fora do intervalo permitido ({minimo} a {maximo}).");
                 Console.ResetColor();
                 continue;
             }
@@ -81,7 +81,7 @@ public static class ValidadorEntrada
             if (string.IsNullOrWhiteSpace(entrada))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ Campo obrigatório! Digite um valor.");
+                Console.WriteLine("Campo obrigatório! Digite um valor.");
                 Console.ResetColor();
                 continue;
             }
@@ -89,7 +89,7 @@ public static class ValidadorEntrada
             if (!decimal.TryParse(entrada, out decimal valor))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ Valor inválido! Use ponto (.) ou vírgula (,) como separador decimal.");
+                Console.WriteLine("Valor inválido! Use ponto (.) ou vírgula (,) como separador decimal.");
                 Console.ResetColor();
                 continue;
             }
@@ -97,7 +97,7 @@ public static class ValidadorEntrada
             if (valor < minimo)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ O valor não pode ser menor que R$ {minimo}.");
+                Console.WriteLine($"O valor não pode ser menor que R$ {minimo}.");
                 Console.ResetColor();
                 continue;
             }
@@ -105,7 +105,7 @@ public static class ValidadorEntrada
             if (valor > maximo)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ O valor excede o limite permitido.");
+                Console.WriteLine($"O valor excede o limite permitido.");
                 Console.ResetColor();
                 continue;
             }
@@ -127,7 +127,7 @@ public static class ValidadorEntrada
             if (string.IsNullOrWhiteSpace(entrada))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("❌ Digite uma opção válida.");
+                Console.WriteLine("Digite uma opção válida.");
                 Console.ResetColor();
                 continue;
             }
@@ -139,7 +139,7 @@ public static class ValidadorEntrada
             }
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❌ Opção inválida! Escolha entre: {string.Join(", ", opcoes)}");
+            Console.WriteLine($"Opção inválida! Escolha entre: {string.Join(", ", opcoes)}");
             Console.ResetColor();
         }
     }
@@ -150,7 +150,7 @@ public static class ValidadorEntrada
     public static void MostrarSucesso(string mensagem)
     {
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"✅ {mensagem}");
+        Console.WriteLine($" {mensagem}");
         Console.ResetColor();
     }
 
@@ -160,7 +160,7 @@ public static class ValidadorEntrada
     public static void MostrarErro(string mensagem)
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"❌ {mensagem}");
+        Console.WriteLine($" {mensagem}");
         Console.ResetColor();
     }
 
@@ -170,7 +170,7 @@ public static class ValidadorEntrada
     public static void MostrarInfo(string mensagem)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"ℹ️ {mensagem}");
+        Console.WriteLine($" {mensagem}");
         Console.ResetColor();
     }
 }

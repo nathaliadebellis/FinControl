@@ -81,10 +81,11 @@ while (executarSistema)
     Console.WriteLine("7 - Relatório Financeiro");
     Console.WriteLine("8 - Backup e Recuperação");
     Console.WriteLine("9 - Ver Erros Recentes");
+    Console.WriteLine("10 - Dashboard Financeiro");
     Console.WriteLine("0 - Sair");
     Console.WriteLine();
 
-    string opcao = ValidadorEntrada.LerOpcaoMenu(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" });
+    string opcao = ValidadorEntrada.LerOpcaoMenu(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "0" });
 
     switch (opcao)
     {
@@ -122,6 +123,10 @@ while (executarSistema)
 
         case "9":
             GerenciadorErros.ExibirRelatorioDErros();
+            break;
+
+        case "10":
+            DashboardService.Exibir(transacoes);
             break;
 
         case "0":

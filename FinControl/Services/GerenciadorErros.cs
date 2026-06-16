@@ -174,7 +174,7 @@ public static class GerenciadorErros
             try
             {
                 funcaoSalvar();
-                _logger?.RegistrarInfo($"✅ {descricao} salvo com sucesso.");
+                _logger?.RegistrarInfo($" {descricao} salvo com sucesso.");
                 return true;
             }
             catch (Exception ex)
@@ -346,7 +346,7 @@ public static class GerenciadorErros
         else
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("✅ Nenhum erro registrado!");
+            Console.WriteLine(" Nenhum erro registrado!");
             Console.ResetColor();
         }
 
@@ -359,21 +359,21 @@ public static class GerenciadorErros
     private static void ExibirErro(string mensagem)
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"❌ {mensagem}");
+        Console.WriteLine($" {mensagem}");
         Console.ResetColor();
     }
 
     private static void ExibirAviso(string mensagem)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"⚠️ {mensagem}");
+        Console.WriteLine($" {mensagem}");
         Console.ResetColor();
     }
 
     private static void ExibirInfo(string mensagem)
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"ℹ️ {mensagem}");
+        Console.WriteLine($" {mensagem}");
         Console.ResetColor();
     }
 }
