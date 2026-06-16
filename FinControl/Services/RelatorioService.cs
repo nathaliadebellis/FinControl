@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace FinControl.Services;
 
+/// <summary>
+/// Provides financial reports and related helpers for console UI.
+/// </summary>
 public static class RelatorioService
 {
     public static void RelatorioFinanceiro(List<Transacao> transacoes)
@@ -115,18 +118,18 @@ public static class RelatorioService
 
         foreach (var item in transacoes)
         {
-            if (item.Date.Month == mes &&
-                item.Date.Year == ano)
+            if (item.Data.Month == mes &&
+                item.Data.Year == ano)
             {
                 transacoesDoMes.Add(item);
 
-                if (item.Type == TipoTransacao.Receita)
+                if (item.Tipo == TipoTransacao.Receita)
                 {
-                    totalReceitas += item.Value;
+                    totalReceitas += item.Valor;
                 }
-                else if (item.Type == TipoTransacao.Despesa)
+                else if (item.Tipo == TipoTransacao.Despesa)
                 {
-                    totalDespesas += item.Value;
+                    totalDespesas += item.Valor;
                 }
             }
         }
@@ -136,15 +139,9 @@ public static class RelatorioService
             Console.WriteLine("Nenhuma transação encontrada para este período.");
             return;
         }
-        foreach (var item in transacoesDoMes.OrderBy(t => t.Date))
+        foreach (var item in transacoesDoMes.OrderBy(t => t.Data))
         {
-            Console.WriteLine($"ID: {item.Id}");
-            Console.WriteLine($"Data: {item.Date:dd/MM/yyyy}");
-            Console.WriteLine($"Descrição: {item.Description}");
-            Console.WriteLine($"Categoria: {item.Category}");
-            Console.WriteLine($"Tipo: {item.Type}");
-            Console.WriteLine($"Valor: R$ {item.Value:F2}");
-            Console.WriteLine("--------------------");
+            Formatting.PrintTransacao(item);
         }
 
         decimal saldo = totalReceitas - totalDespesas;
@@ -193,17 +190,17 @@ public static class RelatorioService
 
         foreach (var item in transacoes)
         {
-            if (item.Date.Year == ano)
+            if (item.Data.Year == ano)
             {
                 transacoesDoAno.Add(item);
 
-                if (item.Type == TipoTransacao.Receita)
+                if (item.Tipo == TipoTransacao.Receita)
                 {
-                    totalReceitas += item.Value;
+                    totalReceitas += item.Valor;
                 }
-                else if (item.Type == TipoTransacao.Despesa)
+                else if (item.Tipo == TipoTransacao.Despesa)
                 {
-                    totalDespesas += item.Value;
+                    totalDespesas += item.Valor;
                 }
             }
         }
@@ -214,15 +211,9 @@ public static class RelatorioService
             return;
         }
 
-        foreach (var item in transacoesDoAno.OrderBy(t => t.Date))
+        foreach (var item in transacoesDoAno.OrderBy(t => t.Data))
         {
-            Console.WriteLine($"ID: {item.Id}");
-            Console.WriteLine($"Data: {item.Date:dd/MM/yyyy}");
-            Console.WriteLine($"Descrição: {item.Description}");
-            Console.WriteLine($"Categoria: {item.Category}");
-            Console.WriteLine($"Tipo: {item.Type}");
-            Console.WriteLine($"Valor: R$ {item.Value:F2}");
-            Console.WriteLine("--------------------");
+            Formatting.PrintTransacao(item);
         }
 
 
@@ -238,6 +229,11 @@ public static class RelatorioService
 
     }
 
+    /// <summary>
+    /// Generates a custom report for a specified period. Prompts the user for start and end dates,
+    /// validates them and then builds the report showing each transaction and a summary.
+    /// </summary>
+    /// <param name="transacoes">All available transactions to search within.</param>
     public static void RelatorioPersonalizado(List<Transacao> transacoes)
     {
         int diaInicial = 0;
@@ -322,7 +318,7 @@ public static class RelatorioService
 
         Console.WriteLine();
         Console.WriteLine("====================================");
-        Console.WriteLine($"RELATÓRIO DE {dataInicial:dd/MM/yyyy} ATÉ {dataFinal:dd/MM/yyyy}");
+        Console.WriteLine($"RELATÓRIO DE {dataInicial.ToString(Formatting.DateFormat)} ATÉ {dataFinal.ToString(Formatting.DateFormat)}");
         Console.WriteLine("====================================");
         Console.WriteLine();
 
@@ -330,18 +326,18 @@ public static class RelatorioService
 
         foreach (var item in transacoes)
         {
-            if (item.Date.Date >= dataInicial.Date &&
-                item.Date.Date <= dataFinal.Date)
+            if (item.Data.Date >= dataInicial.Date &&
+                item.Data.Date <= dataFinal.Date)
             {
                 transacoesDoPeriodo.Add(item);
 
-                if (item.Type == TipoTransacao.Receita)
+                if (item.Tipo == TipoTransacao.Receita)
                 {
-                    totalReceitas += item.Value;
+                    totalReceitas += item.Valor;
                 }
-                else if (item.Type == TipoTransacao.Despesa)
+                else if (item.Tipo == TipoTransacao.Despesa)
                 {
-                    totalDespesas += item.Value;
+                    totalDespesas += item.Valor;
                 }
             }
         }
@@ -352,15 +348,9 @@ public static class RelatorioService
             return;
         }
 
-        foreach (var item in transacoesDoPeriodo.OrderBy(t => t.Date))
+        foreach (var item in transacoesDoPeriodo.OrderBy(t => t.Data))
         {
-            Console.WriteLine($"ID: {item.Id}");
-            Console.WriteLine($"Data: {item.Date:dd/MM/yyyy}");
-            Console.WriteLine($"Descrição: {item.Description}");
-            Console.WriteLine($"Categoria: {item.Category}");
-            Console.WriteLine($"Tipo: {item.Type}");
-            Console.WriteLine($"Valor: R$ {item.Value:F2}");
-            Console.WriteLine("--------------------");
+            Formatting.PrintTransacao(item);
         }
 
 
@@ -388,14 +378,14 @@ public static class RelatorioService
 
         foreach (var item in transacoes)
         {
-            if (item.Type == TipoTransacao.Receita)
-            {
-                totalReceitas += item.Value;
-            }
-            else if (item.Type == TipoTransacao.Despesa)
-            {
-                totalDespesas += item.Value;
-            }
+            if (item.Tipo == TipoTransacao.Receita)
+                            {
+                                totalReceitas += item.Valor;
+                            }
+                            else if (item.Tipo == TipoTransacao.Despesa)
+                            {
+                                totalDespesas += item.Valor;
+                            }
         }
 
         decimal saldo = totalReceitas - totalDespesas;
@@ -426,10 +416,10 @@ public static class RelatorioService
 
             foreach (var item in transacoesFiltradas)
             {
-                if (item.Category == categoria &&
-                    item.Type == TipoTransacao.Despesa)
+                if (item.Categoria == categoria &&
+                    item.Tipo == TipoTransacao.Despesa)
                 {
-                    totalCategoria += item.Value;
+                    totalCategoria += item.Valor;
                 }
             }
 

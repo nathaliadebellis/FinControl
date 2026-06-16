@@ -140,10 +140,10 @@ while (executarSistema)
 
         transacao.Id = proximoId++;
 
-        transacao.Date = DateTime.Now;
+        transacao.Data = DateTime.Now; // timestamp when the transaction was created
 
         Console.WriteLine("Digite a descrição:");
-        transacao.Description = Console.ReadLine();
+        transacao.Descricao = Console.ReadLine();
 
         Console.WriteLine("Escolha a categoria:");
 
@@ -166,7 +166,7 @@ while (executarSistema)
                 opcaoCategoria >= 1 &&
                 opcaoCategoria <= Categorias.Lista.Count)
             {
-                transacao.Category = Categorias.Lista[opcaoCategoria - 1];
+                transacao.Categoria = Categorias.Lista[opcaoCategoria - 1];
             }
             else
             {
@@ -191,7 +191,7 @@ while (executarSistema)
             tipoOpcao = Console.ReadLine();
         }
 
-        transacao.Type = tipoOpcao == "1" ? TipoTransacao.Receita : TipoTransacao.Despesa;
+        transacao.Tipo = tipoOpcao == "1" ? TipoTransacao.Receita : TipoTransacao.Despesa;
 
         decimal valor = 0;
         bool valorValido = false;
@@ -211,7 +211,7 @@ while (executarSistema)
             }
         }
 
-        transacao.Value = valor;
+        transacao.Valor = valor;
 
         transacoes.Add(transacao);
 
@@ -220,7 +220,10 @@ while (executarSistema)
         Console.WriteLine("Transação cadastrada com sucesso!");
     }
 
-    void ListarTransacoes()
+    /// <summary>
+        /// Lists all transactions to the console using application formatting.
+        /// </summary>
+        void ListarTransacoes()
     {
         if (transacoes.Count == 0)
         {
@@ -230,13 +233,7 @@ while (executarSistema)
 
         foreach (var item in transacoes)
         {
-            Console.WriteLine($"ID: {item.Id}");
-            Console.WriteLine($"Data: {item.Date:dd/MM/yyyy HH:mm}");
-            Console.WriteLine($"Descrição: {item.Description}");
-            Console.WriteLine($"Categoria: {item.Category}");
-            Console.WriteLine($"Tipo: {item.Type}");
-            Console.WriteLine($"Valor: R$ {item.Value}");
-            Console.WriteLine("--------------------");
+            Formatting.PrintTransacao(item);
         }
     }
 
@@ -245,35 +242,32 @@ while (executarSistema)
         decimal saldo = 0;
         foreach (var item in transacoes)
         {
-            if (item.Type == TipoTransacao.Receita)
+            if (item.Tipo == TipoTransacao.Receita)
             {
-                saldo += item.Value;
+                saldo += item.Valor;
             }
-            else if (item.Type == TipoTransacao.Despesa)
+            else if (item.Tipo == TipoTransacao.Despesa)
             {
-                saldo -= item.Value;
+                saldo -= item.Valor;
             }
         }
 
         Console.WriteLine($"Saldo atual: R$ {saldo:F2}");
     }
 
-    void BuscarTransacao()
+    /// <summary>
+        /// Interactive search for transactions by partial description; prints matches.
+        /// </summary>
+        void BuscarTransacao()
     {
         Console.WriteLine("Digite a descrição da transação que deseja buscar:");
         string descricaoBuscar = Console.ReadLine();
         bool encontrou = false;
         foreach (var item in transacoes)
         {
-            if (item.Description.ToUpper().Contains(descricaoBuscar.ToUpper()))
+            if (item.Descricao.ToUpper().Contains(descricaoBuscar.ToUpper()))
             {
-                Console.WriteLine($"ID: {item.Id}");
-                Console.WriteLine($"Data: {item.Date:dd/MM/yyyy HH:mm}");
-                Console.WriteLine($"Descrição: {item.Description}");
-                Console.WriteLine($"Categoria: {item.Category}");
-                Console.WriteLine($"Tipo: {item.Type}");
-                Console.WriteLine($"Valor: R$ {item.Value}");
-                Console.WriteLine("--------------------");
+                Formatting.PrintTransacao(item);
                 encontrou = true;
             }
         }
@@ -283,24 +277,27 @@ while (executarSistema)
         }
     }
 
-    void EditarTransacao()
+    /// <summary>
+            /// Edits a transaction located by exact description match. Prompts for new values.
+            /// </summary>
+            void EditarTransacao()
     {
         Console.WriteLine("Digite a descrição da transação que deseja editar:");
         string descricaoEditar = Console.ReadLine();
         bool encontrou = false;
         foreach (var item in transacoes)
         {
-            if (item.Description.ToUpper() == descricaoEditar.ToUpper())
+            if (item.Descricao.ToUpper() == descricaoEditar.ToUpper())
             {
-                Console.WriteLine($"Descrição atual: {item.Description}");
-                Console.WriteLine($"Categoria atual: {item.Category}");
-                Console.WriteLine($"Tipo atual: {item.Type}");
-                Console.WriteLine($"Valor atual: R$ {item.Value}");
+                Console.WriteLine($"Descrição atual: {item.Descricao}");
+                Console.WriteLine($"Categoria atual: {item.Categoria}");
+                Console.WriteLine($"Tipo atual: {item.Tipo}");
+                Console.WriteLine($"Valor atual: R$ {item.Valor:F2}");
 
                 Console.WriteLine("Digite a nova descrição:");
-                item.Description = Console.ReadLine();
+                item.Descricao = Console.ReadLine();
                 Console.WriteLine("Digite a nova categoria:");
-                item.Category = Console.ReadLine();
+                item.Categoria = Console.ReadLine();
                 Console.WriteLine("Digite o novo tipo:");
                 Console.WriteLine("1 - Receita");
                 Console.WriteLine("2 - Despesa");
@@ -312,7 +309,7 @@ while (executarSistema)
                     Console.WriteLine("2 - Despesa");
                     tipoOpcao = Console.ReadLine();
                 }
-                item.Type = tipoOpcao == "1" ? TipoTransacao.Receita : TipoTransacao.Despesa;
+                item.Tipo = tipoOpcao == "1" ? TipoTransacao.Receita : TipoTransacao.Despesa;
                 decimal valor = 0;
                 bool valorValido = false;
                 while (!valorValido)
@@ -327,7 +324,7 @@ while (executarSistema)
                         Console.WriteLine("Valor inválido. Tente novamente.");
                     }
                 }
-                item.Value = valor;
+                item.Valor = valor;
                 encontrou = true;
                 SalvarTransacoes();
                 Console.WriteLine("Transação editada com sucesso!");
@@ -349,7 +346,7 @@ while (executarSistema)
 
         foreach (var item in transacoes.ToList())
         {
-            if (item.Description == descricaoExcluir)
+            if (item.Descricao == descricaoExcluir)
             {
                 transacoes.Remove(item);
                 encontrou = true;

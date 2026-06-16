@@ -5,7 +5,7 @@ using System.Text;
 namespace FinControl.Services;
 
 /// <summary>
-/// Gerencia logging de erros em arquivo
+/// File-based logger used to persist error, info and warning messages to a rotating log file.
 /// </summary>
 public class LoggerArquivos
 {

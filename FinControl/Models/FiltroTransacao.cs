@@ -1,30 +1,48 @@
 ﻿namespace FinControl.Models;
 
-/// Filtro avançado para buscar transações com múltiplos critérios
+/// <summary>
+/// Represents a combination of optional criteria used to filter transactions.
+/// </summary>
 public class FiltroTransacao
 {
-    /// Descrição parcial (case-insensitive)
+    /// <summary>
+    /// Partial description to search for (case-insensitive).
+    /// </summary>
     public string? Descricao { get; set; }
 
-    /// Categoria específica
+    /// <summary>
+    /// Specific category name to match.
+    /// </summary>
     public string? Categoria { get; set; }
 
-    /// Tipo de transação (Receita/Despesa)
+    /// <summary>
+    /// Transaction type to filter by.
+    /// </summary>
     public TipoTransacao? Tipo { get; set; }
 
-    /// Data inicial do período
+    /// <summary>
+    /// Start date for the filtering period.
+    /// </summary>
     public DateTime? DataInicial { get; set; }
 
-    /// Data final do período
+    /// <summary>
+    /// End date for the filtering period.
+    /// </summary>
     public DateTime? DataFinal { get; set; }
 
-    /// Valor mínimo da transação
+    /// <summary>
+    /// Minimum transaction value.
+    /// </summary>
     public decimal? ValorMinimo { get; set; }
 
-    /// Valor máximo da transação
+    /// <summary>
+    /// Maximum transaction value.
+    /// </summary>
     public decimal? ValorMaximo { get; set; }
 
-    /// Verifica se o filtro tem algum critério ativo
+    /// <summary>
+    /// Returns true when at least one filter criterion has been set.
+    /// </summary>
     public bool TemFiltroAtivo()
     {
         return !string.IsNullOrWhiteSpace(Descricao) ||

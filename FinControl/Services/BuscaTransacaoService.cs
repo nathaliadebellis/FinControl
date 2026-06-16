@@ -25,7 +25,7 @@ public static class BuscaTransacaoService
             .Where(t => FiltrarTipo(t, filtro.Tipo))
             .Where(t => FiltrarPeriodo(t, filtro.DataInicial, filtro.DataFinal))
             .Where(t => FiltrarFaixaValor(t, filtro.ValorMinimo, filtro.ValorMaximo))
-            .OrderByDescending(t => t.Date)
+            .OrderByDescending(t => t.Data)
             .ToList();
     }
 
@@ -37,7 +37,7 @@ public static class BuscaTransacaoService
         if (string.IsNullOrWhiteSpace(descricao))
             return true;
 
-        return transacao.Description
+        return transacao.Descricao
             .Contains(descricao, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -49,7 +49,7 @@ public static class BuscaTransacaoService
         if (string.IsNullOrWhiteSpace(categoria))
             return true;
 
-        return transacao.Category.Equals(categoria, StringComparison.OrdinalIgnoreCase);
+        return transacao.Categoria.Equals(categoria, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ public static class BuscaTransacaoService
         if (!tipo.HasValue)
             return true;
 
-        return transacao.Type == tipo.Value;
+        return transacao.Tipo == tipo.Value;
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public static class BuscaTransacaoService
     /// </summary>
     private static bool FiltrarPeriodo(Transacao transacao, DateTime? dataInicial, DateTime? dataFinal)
     {
-        var data = transacao.Date.Date;
+        var data = transacao.Data.Date;
 
         if (dataInicial.HasValue && data < dataInicial.Value.Date)
             return false;
@@ -87,10 +87,10 @@ public static class BuscaTransacaoService
         decimal? valorMinimo,
         decimal? valorMaximo)
     {
-        if (valorMinimo.HasValue && transacao.Value < valorMinimo.Value)
+        if (valorMinimo.HasValue && transacao.Valor < valorMinimo.Value)
             return false;
 
-        if (valorMaximo.HasValue && transacao.Value > valorMaximo.Value)
+        if (valorMaximo.HasValue && transacao.Valor > valorMaximo.Value)
             return false;
 
         return true;
@@ -103,7 +103,7 @@ public static class BuscaTransacaoService
     {
         var filtro = new FiltroTransacao();
 
-        Console.WriteLine("\n=== BUSCA AVANÇADA DE TRANSAÇÕES ===\n");
+        Console.WriteLine("\n=== BUSCA AVANÇADA DE TRANSAÇÕES ===\n"); // interactive filter builder
         Console.WriteLine("(Deixe em branco para não aplicar o filtro)\n");
 
         // Descrição
@@ -182,18 +182,12 @@ public static class BuscaTransacaoService
 
         foreach (var transacao in transacoes)
         {
-            Console.WriteLine($"ID: {transacao.Id}");
-            Console.WriteLine($"Data: {transacao.Date:dd/MM/yyyy}");
-            Console.WriteLine($"Descrição: {transacao.Description}");
-            Console.WriteLine($"Categoria: {transacao.Category}");
-            Console.WriteLine($"Tipo: {transacao.Type}");
-            Console.WriteLine($"Valor: R$ {transacao.Value:F2}");
-            Console.WriteLine("────────────────────────────────────────────────────");
+            Formatting.PrintTransacao(transacao);
 
-            if (transacao.Type == TipoTransacao.Receita)
-                totalReceitas += transacao.Value;
+            if (transacao.Tipo == TipoTransacao.Receita)
+                totalReceitas += transacao.Valor;
             else
-                totalDespesas += transacao.Value;
+                totalDespesas += transacao.Valor;
         }
 
         Console.WriteLine("\n=== RESUMO DA BUSCA ===");
