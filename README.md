@@ -102,6 +102,7 @@ FinControl/
 │
 ├── Services/
 │   ├── BuscaTransacaoService.cs
+│   ├── DashboardServices.cs
 │   ├── ExcecoesCustomizadas.cs
 │   ├── Formatting.cs
 │   ├── GerenciadorErros.cs
