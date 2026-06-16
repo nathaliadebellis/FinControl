@@ -1,6 +1,6 @@
 # 💰 FinControl
 
-FinControl é uma aplicação de console desenvolvida em C# e .NET para gerenciamento de finanças pessoais. O sistema permite registrar receitas e despesas, categorizar movimentações, acompanhar o saldo financeiro, gerar relatórios detalhados e manter os dados protegidos por meio de um sistema de backup e recuperação.
+FinControl é uma aplicação de console desenvolvida em C# e .NET para gerenciamento de finanças pessoais. O sistema permite registrar receitas e despesas, categorizar movimentações, acompanhar o saldo financeiro, visualizar um dashboard com indicadores financeiros, gerar relatórios detalhados e manter os dados protegidos por meio de um sistema de backup e recuperação.
 
 Projeto desenvolvido com foco no aprendizado de Programação Orientada a Objetos (POO), LINQ, serialização JSON, tratamento de exceções, validação de dados e boas práticas de desenvolvimento com .NET.
 
@@ -32,6 +32,15 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 * Cálculo automático de receitas e despesas
 * Atualização dinâmica do saldo com base nas movimentações cadastradas
 
+### 📈 Dashboard Financeiro
+
+- Visualização consolidada do saldo atual
+- Exibição do total de receitas e despesas
+- Identificação da categoria com maior gasto
+- Destaque para a maior receita e maior despesa registradas
+- Resumo das últimas transações
+- Distribuição percentual dos gastos por categoria
+
 ### 📊 Relatórios 
 
 * Relatório financeiro geral
@@ -62,6 +71,7 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 * Registro de erros em log
 * Consulta aos erros recentes
 * Validação das entradas do usuário
+
 
 ---
 
@@ -164,12 +174,12 @@ Durante o desenvolvimento deste projeto foram aplicados conceitos como:
 * Validação de entrada de dados
 * Persistência de informações
 * Backup e recuperação de dados
+* Agregação e análise de dados com LINQ para construção de dashboards
 
 ---
 
 ## 🔮 Próximas Melhorias
 
-- Dashboard financeiro
 - Exportação de relatórios para CSV
 - Persistência utilizando SQLite
 - Interface gráfica (WPF, WinForms ou Blazor)
