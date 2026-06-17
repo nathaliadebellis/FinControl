@@ -34,12 +34,23 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 
 ### 📈 Dashboard Financeiro
 
-- Visualização consolidada do saldo atual
-- Exibição do total de receitas e despesas
-- Identificação da categoria com maior gasto
-- Destaque para a maior receita e maior despesa registradas
-- Resumo das últimas transações
-- Distribuição percentual dos gastos por categoria
+* Visualização consolidada do saldo atual
+* Exibição do total de receitas e despesas
+* Cálculo do percentual de economia
+* Índice de Saúde Financeira baseado no comportamento financeiro
+* Identificação da categoria com maior gasto
+* Destaque para a maior receita e maior despesa registradas
+* Resumo das últimas transações
+* Distribuição percentual dos gastos por categoria com indicadores visuais
+* Geração de análises automáticas para auxiliar na tomada de decisões
+
+### 🎯 Planejamento Financeiro
+
+* Gerenciamento de orçamentos por categoria
+* Definição de limites mensais de gastos
+* Alertas automáticos quando uma categoria se aproxima ou ultrapassa o orçamento definido
+* Cadastro e acompanhamento de metas de economia
+* Organização das funcionalidades em menus e submenus para facilitar a navegação
 
 ### 📊 Relatórios 
 
@@ -92,23 +103,29 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 ```text
 FinControl/
 ├── Data/
-│   └── transacoes.json
+│   ├── transacoes.json
+│   ├── orcamentos.json
+│   └── metaEconomia.json
 │
 ├── Models/
-│   ├── Categorias.cs
-│   ├── FiltroTransacao.cs
-│   ├── TipoTransacao.cs
-│   └── Transacao.cs
+│ ├── Categorias.cs
+│ ├── FiltroTransacao.cs
+│ ├── MetaEconomia.cs
+│ ├── OrcamentoCategoria.cs
+│ ├── TipoTransacao.cs
+│ └── Transacao.cs
 │
 ├── Services/
-│   ├── BuscaTransacaoService.cs
-│   ├── DashboardServices.cs
-│   ├── ExcecoesCustomizadas.cs
-│   ├── Formatting.cs
-│   ├── GerenciadorErros.cs
-│   ├── LoggerArquivos.cs
-│   ├── RelatorioService.cs
-│   └── ValidadorEntrada.cs
+│ ├── BuscaTransacaoService.cs
+│ ├── DashboardService.cs
+│ ├── ExcecoesCustomizadas.cs
+│ ├── Formatting.cs
+│ ├── GerenciadorErros.cs
+│ ├── LoggerArquivos.cs
+│ ├── MetaEconomiaService.cs
+│ ├── OrcamentoService.cs
+│ ├── RelatorioService.cs
+│ └── ValidadorEntrada.cs
 │
 └── Program.cs
 ```
@@ -176,16 +193,22 @@ Durante o desenvolvimento deste projeto foram aplicados conceitos como:
 * Persistência de informações
 * Backup e recuperação de dados
 * Agregação e análise de dados com LINQ para construção de dashboards
-
+* Planejamento financeiro com orçamentos por categoria
+* Definição e acompanhamento de metas de economia
+* Geração de indicadores financeiros e análises inteligentes
 ---
 
 ## 🔮 Próximas Melhorias
 
-- Exportação de relatórios para CSV
-- Persistência utilizando SQLite
+- Exportação de relatórios para CSV e Excel
+- Persistência de dados utilizando SQLite ou SQL Server
 - Interface gráfica (WPF, WinForms ou Blazor)
-- Testes automatizados
+- Testes automatizados (xUnit/NUnit)
 - Injeção de Dependência (Dependency Injection)
 - Arquitetura baseada em interfaces
+- Geração de gráficos financeiros
+- Sistema de autenticação e múltiplos usuários
+- Filtros avançados para pesquisa de transações
+- Notificações inteligentes para metas de economia e controle de gastos
 
 ---
