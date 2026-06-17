@@ -3,17 +3,36 @@ using FinControl.Models;
 namespace FinControl.Services;
 
 /// <summary>
-/// Helper utilities for consistent formatting and output across reports.
+/// Funções auxiliares para manter a formatação e a saída consistentes entre as telas da aplicação.
 /// </summary>
 internal static class Formatting
 {
     /// <summary>
-    /// Standard date format used across the application.
+    /// Formato de data padrão utilizado em toda a aplicação.
     /// </summary>
     public const string DateFormat = "dd/MM/yyyy";
 
     /// <summary>
-    /// Prints a single transaction to the Console using the application's standard layout.
+    /// Exibe um cabeçalho padronizado no console.
+    /// </summary>
+    public static void ExibirCabecalho(string titulo)
+    {
+        Console.Clear();
+
+        const int largura = 36;
+        titulo = titulo.ToUpper();
+
+        int espacosEsquerda = (largura - titulo.Length) / 2;
+        int espacosDireita = largura - titulo.Length - espacosEsquerda;
+
+        Console.WriteLine("╔════════════════════════════════════╗");
+        Console.WriteLine($"║{new string(' ', espacosEsquerda)}{titulo}{new string(' ', espacosDireita)}║");
+        Console.WriteLine("╚════════════════════════════════════╝");
+        Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Exibe uma única transação no console usando o layout padrão da aplicação.
     /// </summary>
     public static void PrintTransacao(Transacao t)
     {
@@ -24,5 +43,12 @@ internal static class Formatting
         Console.WriteLine($"Tipo: {t.Tipo}");
         Console.WriteLine($"Valor: R$ {t.Valor:F2}");
         Console.WriteLine("--------------------");
+    }
+
+    public static void AguardarRetorno()
+    {
+        Console.WriteLine();
+        Console.WriteLine("Pressione ENTER para continuar...");
+        Console.ReadLine();
     }
 }

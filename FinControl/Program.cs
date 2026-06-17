@@ -63,6 +63,10 @@ if (transacoes.Count > 0)
     proximoId = transacoes.Max(t => t.Id) + 1;
 }
 
+List<OrcamentoCategoria> orcamentos = OrcamentoService.Carregar();
+
+Console.WriteLine($"Orçamentos carregados: {orcamentos.Count}");
+
 while (executarSistema)
 {
     Console.Clear();
@@ -71,62 +75,32 @@ while (executarSistema)
     Console.WriteLine("║  Seu sistema de gestão financeira  ║");
     Console.WriteLine("╚════════════════════════════════════╝");
     Console.WriteLine();
-    Console.WriteLine("Para continuar, escolha uma opção:");
-    Console.WriteLine("1 - Adicionar Transação");
-    Console.WriteLine("2 - Listar Transações");
-    Console.WriteLine("3 - Ver Saldo Atual");
-    Console.WriteLine("4 - Buscar Transação");
-    Console.WriteLine("5 - Editar Transação");
-    Console.WriteLine("6 - Excluir Transação");
-    Console.WriteLine("7 - Relatório Financeiro");
-    Console.WriteLine("8 - Backup e Recuperação");
-    Console.WriteLine("9 - Ver Erros Recentes");
-    Console.WriteLine("10 - Dashboard Financeiro");
+
+    Console.WriteLine("1 - Visão Geral");
+    Console.WriteLine("2 - Transações");
+    Console.WriteLine("3 - Planejamento Financeiro");
+    Console.WriteLine("4 - Sistema");
     Console.WriteLine("0 - Sair");
     Console.WriteLine();
 
-    string opcao = ValidadorEntrada.LerOpcaoMenu(new[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "0" });
+    string opcao = ValidadorEntrada.LerOpcaoMenu(new[] { "1", "2", "3", "4", "0" });
 
     switch (opcao)
     {
         case "1":
-            CadastrarTransacao();
+            MenuVisaoGeral();
             break;
 
         case "2":
-            ListarTransacoes();
+            MenuTransacoes();
             break;
 
         case "3":
-            MostrarSaldo();
+            MenuPlanejamentoFinanceiro();
             break;
 
         case "4":
-            BuscarTransacao();
-            break;
-
-        case "5":
-            EditarTransacao();
-            break;
-
-        case "6":
-            ExcluirTransacao();
-            break;
-
-        case "7":
-            RelatorioService.RelatorioFinanceiro(transacoes);
-            break;
-
-        case "8":
-            MenuBackupRecuperacao();
-            break;
-
-        case "9":
-            GerenciadorErros.ExibirRelatorioDErros();
-            break;
-
-        case "10":
-            DashboardService.Exibir(transacoes);
+            MenuSistema();
             break;
 
         case "0":
@@ -139,13 +113,166 @@ while (executarSistema)
             break;
     }
 
+    void MenuVisaoGeral()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+            Formatting.ExibirCabecalho("VISÃO GERAL");
+            Console.WriteLine("1 - Dashboard Financeiro");
+            Console.WriteLine("2 - Ver Saldo Atual");
+            Console.WriteLine("3 - Relatório Financeiro");
+            Console.WriteLine("0 - Voltar");
+            Console.WriteLine();
+
+            string opcao = ValidadorEntrada.LerOpcaoMenu(
+                new[] { "1", "2", "3", "0" });
+
+            switch (opcao)
+            {
+                case "1":
+                    DashboardService.Exibir(transacoes);
+                    break;
+
+                case "2":
+                    MostrarSaldo();
+                    break;
+
+                case "3":
+                    RelatorioService.RelatorioFinanceiro(transacoes);
+                    break;
+
+                case "0":
+                    continuar = false;
+                    break;
+            }
+        }
+    }
+
+    void MenuTransacoes()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+            Formatting.ExibirCabecalho("TRANSAÇÕES");
+            Console.WriteLine("1 - Adicionar Transação");
+            Console.WriteLine("2 - Listar Transações");
+            Console.WriteLine("3 - Buscar Transação");
+            Console.WriteLine("4 - Editar Transação");
+            Console.WriteLine("5 - Excluir Transação");
+            Console.WriteLine("0 - Voltar");
+            Console.WriteLine();
+
+            string opcao = ValidadorEntrada.LerOpcaoMenu(
+                new[] { "1", "2", "3", "4", "5", "0" });
+
+            switch (opcao)
+            {
+                case "1":
+                    CadastrarTransacao();
+                    break;
+
+                case "2":
+                    ListarTransacoes();
+                    break;
+
+                case "3":
+                    BuscarTransacao();
+                    break;
+
+                case "4":
+                    EditarTransacao();
+                    break;
+
+                case "5":
+                    ExcluirTransacao();
+                    break;
+
+                case "0":
+                    continuar = false;
+                    break;
+            }
+        }
+    }
+
+    void MenuPlanejamentoFinanceiro()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+            Formatting.ExibirCabecalho("PLANEJAMENTO FINANCEIRO");
+            Console.WriteLine("1 - Gerenciar Orçamentos");
+            Console.WriteLine("2 - Meta de Economia");
+            Console.WriteLine("0 - Voltar");
+            Console.WriteLine();
+
+            string opcao = ValidadorEntrada.LerOpcaoMenu(
+                new[] { "1", "2", "0" });
+
+            switch (opcao)
+            {
+                case "1":
+                    MenuGerenciarOrcamentos();
+                    break;
+
+                case "2":
+                    MenuMetaEconomia();
+                    break;
+
+                case "0":
+                    continuar = false;
+                    break;
+
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    Console.ReadLine();
+                    break;
+            }
+        }
+    }
+
+    void MenuSistema()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+            Formatting.ExibirCabecalho("SISTEMA");
+            Console.WriteLine("1 - Backup e Recuperação");
+            Console.WriteLine("2 - Ver Erros Recentes");
+            Console.WriteLine("0 - Voltar");
+            Console.WriteLine();
+
+            string opcao = ValidadorEntrada.LerOpcaoMenu(
+                new[] { "1", "2", "0" });
+
+            switch (opcao)
+            {
+                case "1":
+                    MenuBackupRecuperacao();
+                    break;
+
+                case "2":
+                    GerenciadorErros.ExibirRelatorioDErros();
+                    break;
+
+                case "0":
+                    continuar = false;
+                    break;
+            }
+        }
+    }
+
     void CadastrarTransacao()
     {
         Transacao transacao = new Transacao();
 
         transacao.Id = proximoId++;
 
-        transacao.Data = DateTime.Now; // timestamp when the transaction was created
+        transacao.Data = DateTime.Now; // Timestamp de criação da transação.
 
         Console.WriteLine("Digite a descrição:");
         transacao.Descricao = Console.ReadLine();
@@ -226,9 +353,9 @@ while (executarSistema)
     }
 
     /// <summary>
-        /// Lists all transactions to the console using application formatting.
-        /// </summary>
-        void ListarTransacoes()
+    /// Lista todas as transações no console usando a formatação da aplicação.
+    /// </summary>
+    void ListarTransacoes()
     {
         if (transacoes.Count == 0)
         {
@@ -245,6 +372,7 @@ while (executarSistema)
     void MostrarSaldo()
     {
         decimal saldo = 0;
+
         foreach (var item in transacoes)
         {
             if (item.Tipo == TipoTransacao.Receita)
@@ -257,13 +385,16 @@ while (executarSistema)
             }
         }
 
+        Formatting.ExibirCabecalho("SALDO ATUAL");
         Console.WriteLine($"Saldo atual: R$ {saldo:F2}");
+
+        Formatting.AguardarRetorno();
     }
 
     /// <summary>
-        /// Interactive search for transactions by partial description; prints matches.
-        /// </summary>
-        void BuscarTransacao()
+    /// Realiza uma busca interativa por transações usando parte da descrição e exibe as correspondências.
+    /// </summary>
+    void BuscarTransacao()
     {
         Console.WriteLine("Digite a descrição da transação que deseja buscar:");
         string descricaoBuscar = Console.ReadLine();
@@ -283,9 +414,9 @@ while (executarSistema)
     }
 
     /// <summary>
-            /// Edits a transaction located by exact description match. Prompts for new values.
-            /// </summary>
-            void EditarTransacao()
+    /// Edita uma transação localizada por correspondência exata da descrição e solicita novos valores.
+    /// </summary>
+    void EditarTransacao()
     {
         Console.WriteLine("Digite a descrição da transação que deseja editar:");
         string descricaoEditar = Console.ReadLine();
@@ -368,17 +499,168 @@ while (executarSistema)
         }
     }
 
+
+    void MenuGerenciarOrcamentos()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+
+            Formatting.ExibirCabecalho("GERENCIAR ORÇAMENTOS ");
+
+            Console.WriteLine("1 - Definir orçamento");
+            Console.WriteLine("2 - Listar orçamentos");
+            Console.WriteLine("3 - Remover orçamento");
+            Console.WriteLine("0 - Voltar");
+            Console.WriteLine();
+
+            string opcao = Console.ReadLine() ?? "";
+
+            switch (opcao)
+            {
+                case "1":
+                    OrcamentoService.DefinirOrcamento(orcamentos);
+                    break;
+
+                case "2":
+                    OrcamentoService.ListarOrcamentos(orcamentos);
+                    break;
+
+                case "3":
+                    OrcamentoService.RemoverOrcamento(orcamentos);
+                    break;
+
+                case "0":
+                    continuar = false;
+                    break;
+
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    Console.ReadLine();
+                    break;
+            }
+        }
+    }
+
+    void MenuMetaEconomia()
+    {
+        bool continuar = true;
+
+        while (continuar)
+        {
+
+            Formatting.ExibirCabecalho("META DE ECONOMIA");
+            Console.WriteLine("1 - Definir meta");
+            Console.WriteLine("2 - Visualizar meta");
+            Console.WriteLine("3 - Remover meta");
+            Console.WriteLine("0 - Voltar");
+            Console.WriteLine();
+
+            string opcao = Console.ReadLine() ?? "";
+
+            switch (opcao)
+            {
+                case "1":
+                    DefinirMetaEconomia();
+                    break;
+
+                case "2":
+                    VisualizarMetaEconomia();
+                    break;
+
+                case "3":
+                    RemoverMetaEconomia();
+                    break;
+
+                case "0":
+                    continuar = false;
+                    break;
+
+                default:
+                    Console.WriteLine("Opção inválida.");
+                    Console.ReadLine();
+                    break;
+            }
+        }
+    }
+
+    void DefinirMetaEconomia()
+    {
+        Console.Clear();
+
+        Console.WriteLine("===== DEFINIR META DE ECONOMIA =====");
+        Console.WriteLine();
+
+        decimal valorMeta = 0;
+        bool valido = false;
+
+        while (!valido)
+        {
+            Console.Write("Digite sua meta mensal de economia: R$ ");
+
+            valido = decimal.TryParse(Console.ReadLine(), out valorMeta)
+                      && valorMeta > 0;
+
+            if (!valido)
+            {
+                Console.WriteLine("Informe um valor válido maior que zero.");
+            }
+        }
+
+        MetaEconomia meta = new()
+        {
+            ValorMeta = valorMeta
+        };
+
+        MetaEconomiaService.Salvar(meta);
+
+        Console.WriteLine();
+        Console.WriteLine("Meta salva com sucesso!");
+
+        Formatting.AguardarRetorno();
+    }
+
+    void VisualizarMetaEconomia()
+    {
+        Console.Clear();
+
+        var meta = MetaEconomiaService.Carregar();
+
+        Console.WriteLine("===== META DE ECONOMIA =====");
+        Console.WriteLine();
+
+        if (meta.ValorMeta <= 0)
+        {
+            Console.WriteLine("Nenhuma meta cadastrada.");
+        }
+        else
+        {
+            Console.WriteLine($"Meta atual: R$ {meta.ValorMeta:F2}");
+        }
+
+        Formatting.AguardarRetorno();
+    }
+
+    void RemoverMetaEconomia()
+    {
+        Console.Clear();
+
+        MetaEconomiaService.Salvar(new MetaEconomia());
+
+        Console.WriteLine("Meta removida com sucesso!");
+
+        Formatting.AguardarRetorno();
+    }
+
     void MenuBackupRecuperacao()
     {
         bool continuarMenu = true;
 
         while (continuarMenu)
         {
-            Console.Clear();
-            Console.WriteLine("╔════════════════════════════════════╗");
-            Console.WriteLine("║    BACKUP E RECUPERAÇÃO            ║");
-            Console.WriteLine("╚════════════════════════════════════╝");
-            Console.WriteLine();
+
+            Formatting.ExibirCabecalho("BACKUP E RECUPERAÇÃO");
             Console.WriteLine("Escolha uma opção:");
             Console.WriteLine("1 - Criar Backup Manual");
             Console.WriteLine("2 - Listar Backups");
@@ -412,11 +694,8 @@ while (executarSistema)
 
     void CriarBackupManual()
     {
-        Console.Clear();
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine("     CRIAR BACKUP MANUAL           ");
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine();
+
+        Formatting.ExibirCabecalho("CRIAR BACKUP MANUAL");
 
         bool sucesso = GerenciadorErros.CriarBackup(caminhoArquivo);
 
@@ -429,17 +708,13 @@ while (executarSistema)
             ValidadorEntrada.MostrarErro("Falha ao criar backup.");
         }
 
-        Console.WriteLine("\nPressione ENTER para continuar...");
-        Console.ReadLine();
+        Formatting.AguardarRetorno();
     }
 
     void ListarBackups()
     {
-        Console.Clear();
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine("     BACKUPS DISPONÍVEIS           ");
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine();
+
+        Formatting.ExibirCabecalho("BACKUPS DISPONÍVEIS");
 
         string diretorioBackup = Path.Combine(
             Path.GetDirectoryName(caminhoArquivo)!,
@@ -448,8 +723,7 @@ while (executarSistema)
         if (!Directory.Exists(diretorioBackup))
         {
             ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
-            Console.WriteLine("\nPressione ENTER para continuar...");
-            Console.ReadLine();
+            Formatting.AguardarRetorno();
             return;
         }
 
@@ -460,8 +734,7 @@ while (executarSistema)
         if (arquivos.Count == 0)
         {
             ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
-            Console.WriteLine("\nPressione ENTER para continuar...");
-            Console.ReadLine();
+            Formatting.AguardarRetorno();
             return;
         }
 
@@ -474,17 +747,13 @@ while (executarSistema)
             Console.WriteLine();
         }
 
-        Console.WriteLine("Pressione ENTER para continuar...");
-        Console.ReadLine();
+        Formatting.AguardarRetorno();
     }
 
     void RestaurarBackup()
     {
-        Console.Clear();
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine("     RESTAURAR DO BACKUP           ");
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine();
+
+        Formatting.ExibirCabecalho("RESTAURAR BACKUP");
 
         string diretorioBackup = Path.Combine(
             Path.GetDirectoryName(caminhoArquivo)!,
@@ -493,8 +762,7 @@ while (executarSistema)
         if (!Directory.Exists(diretorioBackup))
         {
             ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
-            Console.WriteLine("\nPressione ENTER para continuar...");
-            Console.ReadLine();
+            Formatting.AguardarRetorno();
             return;
         }
 
@@ -505,8 +773,7 @@ while (executarSistema)
         if (arquivos.Count == 0)
         {
             ValidadorEntrada.MostrarInfo("Nenhum backup disponível.");
-            Console.WriteLine("\nPressione ENTER para continuar...");
-            Console.ReadLine();
+            Formatting.AguardarRetorno();
             return;
         }
 
@@ -526,8 +793,7 @@ while (executarSistema)
         if (confirmacao != "S")
         {
             ValidadorEntrada.MostrarInfo("Restauração cancelada.");
-            Console.WriteLine("\nPressione ENTER para continuar...");
-            Console.ReadLine();
+            Formatting.AguardarRetorno();
             return;
         }
 
@@ -549,17 +815,13 @@ while (executarSistema)
             ValidadorEntrada.MostrarErro($"Erro ao restaurar backup: {ex.Message}");
         }
 
-        Console.WriteLine("\nPressione ENTER para continuar...");
-        Console.ReadLine();
+        Formatting.AguardarRetorno();
     }
 
     void ExibirInfoBackup()
     {
-        Console.Clear();
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine("     INFORMAÇÕES DE BACKUP         ");
-        Console.WriteLine("═══════════════════════════════════");
-        Console.WriteLine();
+
+        Formatting.ExibirCabecalho("INFORMAÇÕES DE BACKUP");
 
         // Informações do arquivo principal
         if (File.Exists(caminhoArquivo))
@@ -603,7 +865,6 @@ while (executarSistema)
             Console.WriteLine("Backups Disponíveis: 0");
         }
 
-        Console.WriteLine("\nPressione ENTER para continuar...");
-        Console.ReadLine();
+        Formatting.AguardarRetorno();
     }
 }

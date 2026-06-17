@@ -5,7 +5,7 @@ using System.Linq;
 namespace FinControl.Services;
 
 /// <summary>
-/// Provides financial reports and related helpers for console UI.
+/// Disponibiliza relatórios financeiros e funções auxiliares para a interface de console.
 /// </summary>
 public static class RelatorioService
 {
@@ -230,10 +230,10 @@ public static class RelatorioService
     }
 
     /// <summary>
-    /// Generates a custom report for a specified period. Prompts the user for start and end dates,
-    /// validates them and then builds the report showing each transaction and a summary.
+    /// Gera um relatório personalizado para um período informado. Solicita as datas inicial e final ao usuário,
+    /// valida os dados e exibe o relatório com todas as transações e um resumo.
     /// </summary>
-    /// <param name="transacoes">All available transactions to search within.</param>
+    /// <param name="transacoes">Conjunto de todas as transações disponíveis para pesquisa.</param>
     public static void RelatorioPersonalizado(List<Transacao> transacoes)
     {
         int diaInicial = 0;

@@ -1,4 +1,5 @@
 ﻿using FinControl.Models;
+using System.Net.NetworkInformation;
 
 namespace FinControl.Services;
 
@@ -33,6 +34,11 @@ public static class DashboardService
 
         decimal saldo = totalReceitas - totalDespesas;
 
+        decimal percentualEconomia = totalReceitas == 0
+            ? 0
+            : (saldo / totalReceitas) * 100;
+
+
         // Agrupa despesas por categoria
         var categorias = transacoes
             .Where(t => t.Tipo == TipoTransacao.Despesa)
@@ -59,6 +65,39 @@ public static class DashboardService
             .OrderByDescending(t => t.Valor)
             .FirstOrDefault();
 
+        int indiceSaudeFinanceira = 100;
+
+        // Gastou mais do que recebeu
+        if (saldo < 0)
+        {
+            indiceSaudeFinanceira -= 50;
+        }
+
+        // Economia inferior a 10%
+        else if (totalReceitas > 0 &&
+                 (saldo / totalReceitas) < 0.10m)
+        {
+            indiceSaudeFinanceira -= 20;
+        }
+
+        // Mais de 70% das despesas concentradas em uma categoria
+        if (maiorCategoria != null &&
+            totalDespesas > 0 &&
+            (maiorCategoria.Total / totalDespesas) > 0.70m)
+        {
+            indiceSaudeFinanceira -= 15;
+        }
+
+        // Muitas despesas em relação às receitas
+        if (totalReceitas > 0 &&
+            totalDespesas / totalReceitas > 0.90m)
+        {
+            indiceSaudeFinanceira -= 15;
+        }
+
+        // Garante que o índice fique entre 0 e 100
+        indiceSaudeFinanceira = Math.Clamp(indiceSaudeFinanceira, 0, 100);
+
         Console.WriteLine("╔════════════════════════════════════════════╗");
         Console.WriteLine("║         DASHBOARD FINANCEIRO               ║");
         Console.WriteLine("╚════════════════════════════════════════════╝");
@@ -67,7 +106,35 @@ public static class DashboardService
         Console.WriteLine($"Saldo Atual:        R$ {saldo:F2}");
         Console.WriteLine($"Receitas:           R$ {totalReceitas:F2}");
         Console.WriteLine($"Despesas:           R$ {totalDespesas:F2}");
-        Console.WriteLine($"Transações:         {transacoes.Count}");
+        Console.WriteLine($"Economia:              {percentualEconomia:F2}%");
+        Console.WriteLine($"Transações:            {transacoes.Count}");
+
+        string status;
+
+        if (indiceSaudeFinanceira >= 90)
+        {
+            status = "Excelente";
+        }
+        else if (indiceSaudeFinanceira >= 70)
+        {
+            status = "Boa";
+        }
+        else if (indiceSaudeFinanceira >= 50)
+        {
+            status = "Regular";
+        }
+        else
+        {
+            status = "Crítica";
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("===== SAÚDE FINANCEIRA =====");
+        Console.WriteLine($"Índice:             {indiceSaudeFinanceira}/100");
+        Console.WriteLine($"Status:             {status}");
+
+        Console.WriteLine();
+        Console.WriteLine("===== PRINCIPAIS INDICADORES =====");
 
         if (maiorCategoria != null)
             Console.WriteLine($"Maior Categoria:    {maiorCategoria.Categoria} (R$ {maiorCategoria.Total:F2})");
@@ -94,6 +161,36 @@ public static class DashboardService
                 $"{new string('█', blocos),-20} " +
                 $"R$ {categoria.Total,8:F2} ({percentual:P0})");
         }
+
+        Console.WriteLine();
+        Console.WriteLine("===== ANÁLISE FINANCEIRA =====");
+
+        if (saldo < 0)
+        {
+            Console.WriteLine("Atenção: suas despesas ultrapassaram as receitas.");
+        }
+        else if (percentualEconomia >= 20)
+        {
+            Console.WriteLine("Excelente! Você está economizando uma boa parte da sua renda.");
+        }
+        else if (percentualEconomia >= 10)
+        {
+            Console.WriteLine("Bom controle financeiro, mas ainda há espaço para economizar mais.");
+        }
+        else
+        {
+            Console.WriteLine("Sua margem de economia está baixa. Revise seus gastos.");
+        }
+
+        if (maiorCategoria != null && totalDespesas > 0)
+        {
+            decimal percentualCategoria =
+                (maiorCategoria.Total / totalDespesas) * 100;
+
+            Console.WriteLine(
+                $"{maiorCategoria.Categoria} representa {percentualCategoria:F0}% das despesas.");
+        }
+
 
         Console.WriteLine();
         Console.WriteLine("===== ÚLTIMAS TRANSAÇÕES =====");

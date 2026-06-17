@@ -3,12 +3,12 @@
 namespace FinControl.Models;
 
 /// <summary>
-/// Represents a financial transaction record.
+/// Representa um registro de transação financeira.
 /// </summary>
 public class Transacao
 {
     /// <summary>
-    /// Unique identifier for the transaction.
+    /// Identificador único da transação.
     /// </summary>
     public int Id { get; set; }
 

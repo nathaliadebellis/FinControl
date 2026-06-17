@@ -3,7 +3,7 @@
 namespace FinControl.Services;
 
 /// <summary>
-/// Helper methods for validating and reading user input from the console.
+/// Métodos auxiliares para validação e leitura da entrada do usuário no console.
 /// </summary>
 public static class ValidadorEntrada
 {

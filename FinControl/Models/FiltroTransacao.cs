@@ -1,47 +1,47 @@
 ﻿namespace FinControl.Models;
 
 /// <summary>
-/// Represents a combination of optional criteria used to filter transactions.
+/// Representa uma combinação de critérios opcionais usados para filtrar transações.
 /// </summary>
 public class FiltroTransacao
 {
     /// <summary>
-    /// Partial description to search for (case-insensitive).
+    /// Descrição parcial a ser pesquisada (não diferencia maiúsculas de minúsculas).
     /// </summary>
     public string? Descricao { get; set; }
 
     /// <summary>
-    /// Specific category name to match.
+    /// Nome da categoria a ser correspondido exatamente.
     /// </summary>
     public string? Categoria { get; set; }
 
     /// <summary>
-    /// Transaction type to filter by.
+    /// Tipo de transação usado para filtragem.
     /// </summary>
     public TipoTransacao? Tipo { get; set; }
 
     /// <summary>
-    /// Start date for the filtering period.
+    /// Data de início do período de filtragem.
     /// </summary>
     public DateTime? DataInicial { get; set; }
 
     /// <summary>
-    /// End date for the filtering period.
+    /// Data de fim do período de filtragem.
     /// </summary>
     public DateTime? DataFinal { get; set; }
 
     /// <summary>
-    /// Minimum transaction value.
+    /// Valor mínimo da transação.
     /// </summary>
     public decimal? ValorMinimo { get; set; }
 
     /// <summary>
-    /// Maximum transaction value.
+    /// Valor máximo da transação.
     /// </summary>
     public decimal? ValorMaximo { get; set; }
 
     /// <summary>
-    /// Returns true when at least one filter criterion has been set.
+    /// Retorna verdadeiro quando pelo menos um critério de filtragem foi definido.
     /// </summary>
     public bool TemFiltroAtivo()
     {

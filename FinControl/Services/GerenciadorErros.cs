@@ -7,7 +7,7 @@ namespace FinControl.Services;
 /// Gerenciador centralizado de erros e recuperação
 /// </summary>
 /// <summary>
-/// Centralized error management utilities: wraps operations with handling, backups and logging.
+/// Utilitários centralizados de gerenciamento de erros que encapsulam operações com tratamento de erros, backups e logging.
 /// </summary>
 public static class GerenciadorErros
 {
