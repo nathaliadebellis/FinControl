@@ -2,7 +2,7 @@
 
 FinControl é uma aplicação de console desenvolvida em C# e .NET para gerenciamento de finanças pessoais. O sistema permite registrar receitas e despesas, categorizar movimentações, acompanhar o saldo financeiro, visualizar um dashboard com indicadores financeiros, gerar relatórios detalhados e manter os dados protegidos por meio de um sistema de backup e recuperação.
 
-O projeto foi desenvolvido com foco no aprendizado de Programação Orientada a Objetos (POO), LINQ, serialização JSON, tratamento de exceções, validação de dados e boas práticas de desenvolvimento com .NET.
+O projeto está em constante evolução e faz parte da minha jornada de aprendizado em desenvolvimento de software. Pretendo continuar expandindo suas funcionalidades e arquitetura, incorporando tecnologias e práticas valorizadas pelo mercado, como C#/.NET, SQL, APIs REST, persistência de dados, Programação Orientada a Objetos (POO), LINQ, arquitetura em camadas, testes automatizados e boas práticas de desenvolvimento.
 
 ---
 
