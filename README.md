@@ -2,7 +2,7 @@
 
 FinControl é uma aplicação de console desenvolvida em C# e .NET para gerenciamento de finanças pessoais. O sistema permite registrar receitas e despesas, categorizar movimentações, acompanhar o saldo financeiro, visualizar um dashboard com indicadores financeiros, gerar relatórios detalhados e manter os dados protegidos por meio de um sistema de backup e recuperação.
 
-Projeto desenvolvido com foco no aprendizado de Programação Orientada a Objetos (POO), LINQ, serialização JSON, tratamento de exceções, validação de dados e boas práticas de desenvolvimento com .NET.
+O projeto foi desenvolvido com foco no aprendizado de Programação Orientada a Objetos (POO), LINQ, serialização JSON, tratamento de exceções, validação de dados e boas práticas de desenvolvimento com .NET.
 
 ---
 
@@ -50,7 +50,6 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 * Definição de limites mensais de gastos
 * Alertas automáticos quando uma categoria se aproxima ou ultrapassa o orçamento definido
 * Cadastro e acompanhamento de metas de economia
-* Organização das funcionalidades em menus e submenus para facilitar a navegação
 
 ### 📊 Relatórios 
 
@@ -58,12 +57,12 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 * Relatório mensal
 * Relatório anual
 * Relatório personalizado por período
-* Análise de gastos por categoria
-* Ordenação das transações por data
+* Análise de despesas por categoria
+* Ordenação cronológica das transações
 
 ### 💾 Persistência de Dados
 
-* Armazenamento em arquivo JSON
+* Armazenamento em arquivos JSON
 * Carregamento automático dos dados ao iniciar a aplicação
 * Salvamento automático após alterações
 
@@ -83,7 +82,6 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 * Consulta aos erros recentes
 * Validação das entradas do usuário
 
-
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -95,6 +93,7 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 * Programação Orientada a Objetos (POO)
 * Manipulação de Arquivos
 * Tratamento de Exceções
+* Serialização e Desserialização JSON
 
 ---
 
@@ -102,29 +101,48 @@ Além das operações básicas de cadastro, edição e exclusão de transações
 
 ```text
 FinControl/
+├── Core/
+│ └── AppState.cs
+│
 ├── Data/
-│   ├── transacoes.json
-│   ├── orcamentos.json
-│   └── metaEconomia.json
+│ ├── transacoes.json
+│ ├── orcamentos.json
+│ ├── metaEconomia.json
+│ └── backup/
+│
+├── Menus/
+│ ├── MenuPlanejamentoFinanceiro.cs
+│ ├── MenuRelatorios.cs
+│ ├── MenuSistema.cs
+│ ├── MenuTransacoes.cs
+│ └── MenuVisaoGeral.cs
 │
 ├── Models/
 │ ├── Categorias.cs
+│ ├── DashboardResumo.cs
 │ ├── FiltroTransacao.cs
+│ ├── GastoCategoriaResumo.cs
 │ ├── MetaEconomia.cs
 │ ├── OrcamentoCategoria.cs
 │ ├── TipoTransacao.cs
 │ └── Transacao.cs
 │
+├── Repositories/
+│ ├── MetaEconomiaRepository.cs
+│ ├── OrcamentoRepository.cs
+│ └── TransacaoRepository.cs
+│
 ├── Services/
-│ ├── BuscaTransacaoService.cs
 │ ├── DashboardService.cs
 │ ├── ExcecoesCustomizadas.cs
+│ ├── FinanceiroService.cs
 │ ├── Formatting.cs
 │ ├── GerenciadorErros.cs
 │ ├── LoggerArquivos.cs
 │ ├── MetaEconomiaService.cs
 │ ├── OrcamentoService.cs
 │ ├── RelatorioService.cs
+│ ├── TransacaoService.cs
 │ └── ValidadorEntrada.cs
 │
 └── Program.cs
