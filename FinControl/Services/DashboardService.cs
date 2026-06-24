@@ -1,214 +1,132 @@
-﻿using FinControl.Models;
-using System.Net.NetworkInformation;
+﻿using System.Text;
+using FinControl.Models;
 
 namespace FinControl.Services;
 
 public static class DashboardService
 {
-    public static void Exibir(List<Transacao> transacoes)
+    public static string GerarTexto(DashboardResumo resumo)
     {
-        Console.Clear();
+        var sb = new StringBuilder();
 
-        if (!transacoes.Any())
+        if (resumo == null || resumo.QuantidadeTransacoes == 0)
         {
-            Console.WriteLine("╔════════════════════════════════════╗");
-            Console.WriteLine("║      DASHBOARD FINANCEIRO          ║");
-            Console.WriteLine("╚════════════════════════════════════╝");
-            Console.WriteLine();
+            sb.AppendLine("╔════════════════════════════════════╗");
+            sb.AppendLine("║      DASHBOARD FINANCEIRO          ║");
+            sb.AppendLine("╚════════════════════════════════════╝");
+            sb.AppendLine();
+            sb.AppendLine("Nenhuma transação cadastrada.");
+            sb.AppendLine("Cadastre uma receita ou despesa para visualizar o dashboard.");
 
-            Console.WriteLine("Nenhuma transação cadastrada.");
-            Console.WriteLine("Cadastre uma receita ou despesa para visualizar o dashboard.");
-
-            Console.WriteLine("\nPressione ENTER para voltar...");
-            Console.ReadLine();
-            return;
+            return sb.ToString();
         }
 
-        decimal totalReceitas = transacoes
-            .Where(t => t.Tipo == TipoTransacao.Receita)
-            .Sum(t => t.Valor);
+        // =========================
+        // HEADER
+        // =========================
+        sb.AppendLine("╔════════════════════════════════════════════╗");
+        sb.AppendLine("║         DASHBOARD FINANCEIRO              ║");
+        sb.AppendLine("╚════════════════════════════════════════════╝");
+        sb.AppendLine();
 
-        decimal totalDespesas = transacoes
-            .Where(t => t.Tipo == TipoTransacao.Despesa)
-            .Sum(t => t.Valor);
+        // =========================
+        // RESUMO FINANCEIRO
+        // =========================
+        sb.AppendLine($"Saldo Atual:        R$ {resumo.Saldo:F2}");
+        sb.AppendLine($"Receitas:           R$ {resumo.TotalReceitas:F2}");
+        sb.AppendLine($"Despesas:           R$ {resumo.TotalDespesas:F2}");
+        sb.AppendLine($"Economia:           {resumo.PercentualEconomia:F2}%");
+        sb.AppendLine($"Transações:         {resumo.QuantidadeTransacoes}");
 
-        decimal saldo = totalReceitas - totalDespesas;
+        // =========================
+        // SAÚDE FINANCEIRA
+        // =========================
+        sb.AppendLine();
+        sb.AppendLine("===== SAÚDE FINANCEIRA =====");
+        sb.AppendLine($"Índice:             {resumo.IndiceSaudeFinanceira}/100");
+        sb.AppendLine($"Status:             {resumo.StatusSaudeFinanceira}");
 
-        decimal percentualEconomia = totalReceitas == 0
-            ? 0
-            : (saldo / totalReceitas) * 100;
+        // =========================
+        // META
+        // =========================
+        if (resumo.MetaEconomia > 0)
+        {
+            sb.AppendLine();
+            sb.AppendLine("===== META DE ECONOMIA =====");
+            sb.AppendLine($"Meta:               R$ {resumo.MetaEconomia:F2}");
+            sb.AppendLine($"Progresso:          {resumo.ProgressoMeta:F2}%");
 
-
-        // Agrupa despesas por categoria
-        var categorias = transacoes
-            .Where(t => t.Tipo == TipoTransacao.Despesa)
-            .GroupBy(t => t.Categoria)
-            .Select(g => new
+            if (resumo.MetaAtingida)
             {
-                Categoria = g.Key,
-                Total = g.Sum(t => t.Valor)
-            })
-            .OrderByDescending(g => g.Total)
-            .ToList();
-
-        var maiorCategoria = categorias.FirstOrDefault();
-
-        // Maior receita
-        var maiorReceita = transacoes
-            .Where(t => t.Tipo == TipoTransacao.Receita)
-            .OrderByDescending(t => t.Valor)
-            .FirstOrDefault();
-
-        // Maior despesa
-        var maiorDespesa = transacoes
-            .Where(t => t.Tipo == TipoTransacao.Despesa)
-            .OrderByDescending(t => t.Valor)
-            .FirstOrDefault();
-
-        int indiceSaudeFinanceira = 100;
-
-        // Gastou mais do que recebeu
-        if (saldo < 0)
-        {
-            indiceSaudeFinanceira -= 50;
+                sb.AppendLine("Status:             Meta atingida!");
+            }
         }
 
-        // Economia inferior a 10%
-        else if (totalReceitas > 0 &&
-                 (saldo / totalReceitas) < 0.10m)
+        // =========================
+        // INDICADORES
+        // =========================
+        sb.AppendLine();
+        sb.AppendLine("===== PRINCIPAIS INDICADORES =====");
+
+        if (!string.IsNullOrWhiteSpace(resumo.MaiorCategoria))
         {
-            indiceSaudeFinanceira -= 20;
+            sb.AppendLine(
+                $"Maior Categoria:    {resumo.MaiorCategoria} (R$ {resumo.ValorMaiorCategoria:F2})");
         }
 
-        // Mais de 70% das despesas concentradas em uma categoria
-        if (maiorCategoria != null &&
-            totalDespesas > 0 &&
-            (maiorCategoria.Total / totalDespesas) > 0.70m)
+        if (resumo.MaiorReceita != null)
         {
-            indiceSaudeFinanceira -= 15;
+            sb.AppendLine(
+                $"Maior Receita:      {resumo.MaiorReceita.Descricao} (R$ {resumo.MaiorReceita.Valor:F2})");
         }
 
-        // Muitas despesas em relação às receitas
-        if (totalReceitas > 0 &&
-            totalDespesas / totalReceitas > 0.90m)
+        if (resumo.MaiorDespesa != null)
         {
-            indiceSaudeFinanceira -= 15;
+            sb.AppendLine(
+                $"Maior Despesa:      {resumo.MaiorDespesa.Descricao} (R$ {resumo.MaiorDespesa.Valor:F2})");
         }
 
-        // Garante que o índice fique entre 0 e 100
-        indiceSaudeFinanceira = Math.Clamp(indiceSaudeFinanceira, 0, 100);
+        // =========================
+        // GASTOS POR CATEGORIA
+        // =========================
+        sb.AppendLine();
+        sb.AppendLine("===== GASTOS POR CATEGORIA =====");
 
-        Console.WriteLine("╔════════════════════════════════════════════╗");
-        Console.WriteLine("║         DASHBOARD FINANCEIRO               ║");
-        Console.WriteLine("╚════════════════════════════════════════════╝");
-        Console.WriteLine();
-
-        Console.WriteLine($"Saldo Atual:        R$ {saldo:F2}");
-        Console.WriteLine($"Receitas:           R$ {totalReceitas:F2}");
-        Console.WriteLine($"Despesas:           R$ {totalDespesas:F2}");
-        Console.WriteLine($"Economia:              {percentualEconomia:F2}%");
-        Console.WriteLine($"Transações:            {transacoes.Count}");
-
-        string status;
-
-        if (indiceSaudeFinanceira >= 90)
+        foreach (var categoria in resumo.GastosPorCategoria)
         {
-            status = "Excelente";
-        }
-        else if (indiceSaudeFinanceira >= 70)
-        {
-            status = "Boa";
-        }
-        else if (indiceSaudeFinanceira >= 50)
-        {
-            status = "Regular";
-        }
-        else
-        {
-            status = "Crítica";
-        }
+            int blocos = (int)Math.Round(categoria.Percentual * 20);
 
-        Console.WriteLine();
-        Console.WriteLine("===== SAÚDE FINANCEIRA =====");
-        Console.WriteLine($"Índice:             {indiceSaudeFinanceira}/100");
-        Console.WriteLine($"Status:             {status}");
-
-        Console.WriteLine();
-        Console.WriteLine("===== PRINCIPAIS INDICADORES =====");
-
-        if (maiorCategoria != null)
-            Console.WriteLine($"Maior Categoria:    {maiorCategoria.Categoria} (R$ {maiorCategoria.Total:F2})");
-
-        if (maiorReceita != null)
-            Console.WriteLine($"Maior Receita:      {maiorReceita.Descricao} (R$ {maiorReceita.Valor:F2})");
-
-        if (maiorDespesa != null)
-            Console.WriteLine($"Maior Despesa:      {maiorDespesa.Descricao} (R$ {maiorDespesa.Valor:F2})");
-
-        Console.WriteLine();
-        Console.WriteLine("===== GASTOS POR CATEGORIA =====");
-
-        foreach (var categoria in categorias)
-        {
-            double percentual = totalDespesas == 0
-                ? 0
-                : (double)(categoria.Total / totalDespesas);
-
-            int blocos = (int)Math.Round(percentual * 20);
-
-            Console.WriteLine(
+            sb.AppendLine(
                 $"{categoria.Categoria,-15} " +
                 $"{new string('█', blocos),-20} " +
-                $"R$ {categoria.Total,8:F2} ({percentual:P0})");
+                $"R$ {categoria.Total,8:F2} ({categoria.Percentual:P0})");
         }
 
-        Console.WriteLine();
-        Console.WriteLine("===== ANÁLISE FINANCEIRA =====");
+        // =========================
+        // ANÁLISE
+        // =========================
+        sb.AppendLine();
+        sb.AppendLine("===== ANÁLISE FINANCEIRA =====");
+        sb.AppendLine(resumo.AnaliseFinanceira);
 
-        if (saldo < 0)
+        // =========================
+        // ÚLTIMAS TRANSAÇÕES
+        // =========================
+        sb.AppendLine();
+        sb.AppendLine("===== ÚLTIMAS TRANSAÇÕES =====");
+
+        foreach (var transacao in resumo.UltimasTransacoes)
         {
-            Console.WriteLine("Atenção: suas despesas ultrapassaram as receitas.");
-        }
-        else if (percentualEconomia >= 20)
-        {
-            Console.WriteLine("Excelente! Você está economizando uma boa parte da sua renda.");
-        }
-        else if (percentualEconomia >= 10)
-        {
-            Console.WriteLine("Bom controle financeiro, mas ainda há espaço para economizar mais.");
-        }
-        else
-        {
-            Console.WriteLine("Sua margem de economia está baixa. Revise seus gastos.");
-        }
+            string sinal = transacao.Tipo == TipoTransacao.Receita
+                ? "+"
+                : "-";
 
-        if (maiorCategoria != null && totalDespesas > 0)
-        {
-            decimal percentualCategoria =
-                (maiorCategoria.Total / totalDespesas) * 100;
-
-            Console.WriteLine(
-                $"{maiorCategoria.Categoria} representa {percentualCategoria:F0}% das despesas.");
-        }
-
-
-        Console.WriteLine();
-        Console.WriteLine("===== ÚLTIMAS TRANSAÇÕES =====");
-
-        foreach (var transacao in transacoes
-                     .OrderByDescending(t => t.Data)
-                     .Take(5))
-        {
-            string sinal = transacao.Tipo == TipoTransacao.Receita ? "+" : "-";
-
-            Console.WriteLine(
+            sb.AppendLine(
                 $"{transacao.Data:dd/MM/yyyy} | " +
                 $"{transacao.Descricao,-20} | " +
                 $"{sinal}R$ {transacao.Valor:F2}");
         }
 
-        Console.WriteLine();
-        Console.WriteLine("Pressione ENTER para voltar...");
-        Console.ReadLine();
+        return sb.ToString();
     }
 }

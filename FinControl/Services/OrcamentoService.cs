@@ -1,94 +1,32 @@
 ﻿using FinControl.Models;
-using System.Text.Json;
+using FinControl.Repositories;
 
 namespace FinControl.Services;
 
 public static class OrcamentoService
 {
-    private static readonly string CaminhoArquivo = Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory,
-        "Data",
-        "orcamentos.json");
-
-    /// <summary>
-    /// Carrega os orçamentos salvos em arquivo JSON.
-    /// </summary>
-    public static List<OrcamentoCategoria> Carregar()
+    public static List<OrcamentoCategoria> ListarOrcamentos()
     {
-        Directory.CreateDirectory(
-            Path.GetDirectoryName(CaminhoArquivo)!);
-
-        if (!File.Exists(CaminhoArquivo))
-        {
-            return new List<OrcamentoCategoria>();
-        }
-
-        string json = File.ReadAllText(CaminhoArquivo);
-
-        return JsonSerializer.Deserialize<List<OrcamentoCategoria>>(json)
-               ?? new List<OrcamentoCategoria>();
+        return OrcamentoRepository
+            .Carregar()
+            .OrderBy(o => o.Categoria)
+            .ToList();
     }
 
-    /// <summary>
-    /// Salva os orçamentos em arquivo JSON.
-    /// </summary>
-    public static void Salvar(List<OrcamentoCategoria> orcamentos)
+    public static void DefinirOuAtualizarOrcamento(
+        string categoria,
+        decimal limite)
     {
-        Directory.CreateDirectory(
-            Path.GetDirectoryName(CaminhoArquivo)!);
+        var orcamentos = OrcamentoRepository.Carregar();
 
-        string json = JsonSerializer.Serialize(
-            orcamentos,
-            new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+        var existente = orcamentos.FirstOrDefault(o =>
+            o.Categoria.Equals(categoria, StringComparison.OrdinalIgnoreCase));
 
-        File.WriteAllText(CaminhoArquivo, json);
-    }
+        if (string.IsNullOrWhiteSpace(categoria))
+            throw new ArgumentException("A categoria é obrigatória.");
 
-    public static void DefinirOrcamento(List<OrcamentoCategoria> orcamentos)
-    {
-        Console.Clear();
-        Console.WriteLine("===== DEFINIR ORÇAMENTO =====");
-        Console.WriteLine();
-
-        Console.WriteLine("Escolha a categoria:");
-
-        for (int i = 0; i < Categorias.Lista.Count; i++)
-        {
-            Console.WriteLine($"{i + 1} - {Categorias.Lista[i]}");
-        }
-
-        int opcao;
-
-        while (!int.TryParse(Console.ReadLine(), out opcao) ||
-               opcao < 1 ||
-               opcao > Categorias.Lista.Count)
-        {
-            Console.WriteLine("Categoria inválida. Tente novamente.");
-        }
-
-        string categoria = Categorias.Lista[opcao - 1];
-
-        decimal limite = 0;
-        bool valido = false;
-
-        while (!valido)
-        {
-            Console.Write($"\nDigite o limite mensal para {categoria}: ");
-
-            valido = decimal.TryParse(Console.ReadLine(), out limite)
-                     && limite > 0;
-
-            if (!valido)
-            {
-                Console.WriteLine("Informe um valor maior que zero.");
-            }
-        }
-
-        var existente = orcamentos
-            .FirstOrDefault(o => o.Categoria == categoria);
+        if (limite <= 0)
+            throw new ArgumentException("O limite mensal deve ser maior que zero.");
 
         if (existente != null)
         {
@@ -103,74 +41,61 @@ public static class OrcamentoService
             });
         }
 
-        Salvar(orcamentos);
-
-        Console.WriteLine();
-        Console.WriteLine("✅ Orçamento salvo com sucesso!");
-        Console.WriteLine("\nPressione ENTER para continuar...");
-        Console.ReadLine();
+        OrcamentoRepository.Salvar(orcamentos);
     }
 
-    public static void ListarOrcamentos(List<OrcamentoCategoria> orcamentos)
+    public static bool RemoverOrcamento(string categoria)
     {
-        Console.Clear();
+        var orcamentos = OrcamentoRepository.Carregar();
 
-        Console.WriteLine("===== ORÇAMENTOS CADASTRADOS =====");
-        Console.WriteLine();
+        var orcamento = orcamentos.FirstOrDefault(o =>
+            o.Categoria.Equals(categoria, StringComparison.OrdinalIgnoreCase));
 
-        if (orcamentos.Count == 0)
-        {
-            Console.WriteLine("Nenhum orçamento cadastrado.");
-        }
-        else
-        {
-            foreach (var item in orcamentos)
-            {
-                Console.WriteLine(
-                    $"{item.Categoria,-20} R$ {item.LimiteMensal:F2}");
-            }
-        }
+        if (orcamento == null)
+            return false;
 
-        Console.WriteLine();
-        Console.WriteLine("Pressione ENTER para continuar...");
-        Console.ReadLine();
+        orcamentos.Remove(orcamento);
+        OrcamentoRepository.Salvar(orcamentos);
+
+        return true;
     }
 
-    public static void RemoverOrcamento(List<OrcamentoCategoria> orcamentos)
+    public static List<string> VerificarAlertas(
+        List<Transacao> transacoes)
     {
-        Console.Clear();
+        var orcamentos = OrcamentoRepository.Carregar();
+        List<string> alertas = new();
 
-        if (orcamentos.Count == 0)
+        foreach (var orcamento in orcamentos)
         {
-            Console.WriteLine("Nenhum orçamento cadastrado.");
-            Console.ReadLine();
-            return;
+            decimal gasto = transacoes
+                .Where(t =>
+                    t.Tipo == TipoTransacao.Despesa &&
+                    t.Categoria == orcamento.Categoria)
+                .Sum(t => t.Valor);
+
+            decimal percentual = orcamento.LimiteMensal == 0
+                ? 0
+                : gasto / orcamento.LimiteMensal;
+
+            if (percentual >= 1)
+                alertas.Add($"Orçamento de {orcamento.Categoria} excedido: " +
+                    $"R$ {gasto:F2} de R$ {orcamento.LimiteMensal:F2}.");
+
+            else if (percentual >= 0.8m)
+                alertas.Add($"{orcamento.Categoria}: " +
+                    $"{percentual:P0} do limite utilizado " +
+                    $"(R$ {gasto:F2} de R$ {orcamento.LimiteMensal:F2}).");
         }
 
-        Console.WriteLine("Escolha o orçamento para remover:");
+        return alertas;
+    }
 
-        for (int i = 0; i < orcamentos.Count; i++)
-        {
-            Console.WriteLine(
-                $"{i + 1} - {orcamentos[i].Categoria}");
-        }
+    public static OrcamentoCategoria? ObterPorCategoria(string categoria)
+    {
+        var orcamentos = OrcamentoRepository.Carregar();
 
-        int opcao;
-
-        while (!int.TryParse(Console.ReadLine(), out opcao) ||
-               opcao < 1 ||
-               opcao > orcamentos.Count)
-        {
-            Console.WriteLine("Opção inválida.");
-        }
-
-        orcamentos.RemoveAt(opcao - 1);
-
-        Salvar(orcamentos);
-
-        Console.WriteLine();
-        Console.WriteLine("Orçamento removido com sucesso!");
-        Console.WriteLine("Pressione ENTER para continuar...");
-        Console.ReadLine();
+        return orcamentos.FirstOrDefault(o =>
+    o.Categoria.Equals(categoria, StringComparison.OrdinalIgnoreCase));
     }
 }

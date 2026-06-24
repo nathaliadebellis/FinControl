@@ -1,63 +1,64 @@
-﻿using System.Text.Json;
-using FinControl.Models;
+﻿using FinControl.Models;
+using FinControl.Repositories;
 
 namespace FinControl.Services;
 
 public static class MetaEconomiaService
 {
-    private static readonly string CaminhoArquivo =
-        Path.Combine(
-            AppDomain.CurrentDomain.BaseDirectory,
-            "Data",
-            "metaEconomia.json");
-
-    /// <summary>
-    /// Carrega a meta de economia do arquivo.
-    /// </summary>
-    public static MetaEconomia Carregar()
+    public static void DefinirMeta(decimal valorMeta)
     {
-        return GerenciadorErros.TratarCarregamentoDados(() =>
+        var meta = new MetaEconomia
         {
-            Directory.CreateDirectory(
-                Path.GetDirectoryName(CaminhoArquivo)!);
+            ValorMeta = valorMeta
+        };
 
-            if (!File.Exists(CaminhoArquivo))
-            {
-                return new MetaEconomia();
-            }
-
-            string json = File.ReadAllText(CaminhoArquivo);
-
-            return JsonSerializer.Deserialize<MetaEconomia>(json)
-                   ?? new MetaEconomia();
-
-        },
-        "Meta de Economia",
-        new MetaEconomia()) ?? new MetaEconomia();
+        MetaEconomiaRepository.Salvar(meta);
     }
 
-    /// <summary>
-    /// Salva a meta de economia.
-    /// </summary>
-    public static void Salvar(MetaEconomia meta)
+    public static MetaEconomia ObterMeta()
     {
-        GerenciadorErros.TratarSalvamentoDados(() =>
-        {
-            // Cria backup antes de salvar
-            GerenciadorErros.CriarBackup(CaminhoArquivo);
+        return MetaEconomiaRepository.Carregar();
+    }
 
-            Directory.CreateDirectory(
-                Path.GetDirectoryName(CaminhoArquivo)!);
+    public static void RemoverMeta()
+    {
+        MetaEconomiaRepository.Remover();
+    }
 
-            string json = JsonSerializer.Serialize(
-                meta,
-                new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+    public static decimal CalcularProgresso(
+        decimal economiaAtual,
+        decimal valorMeta)
+    {
+        if (valorMeta <= 0)
+            return 0;
 
-            File.WriteAllText(CaminhoArquivo, json);
+        return (economiaAtual / valorMeta) * 100;
+    }
 
-        }, "Meta de Economia");
+    public static decimal CalcularValorRestante(
+    decimal economiaAtual,
+    decimal valorMeta)
+    {
+        return Math.Max(0, valorMeta - economiaAtual);
+    }
+
+    public static string ObterStatusMeta(
+    decimal economiaAtual,
+    decimal valorMeta)
+    {
+        if (valorMeta <= 0)
+            return "Nenhuma meta definida.";
+
+        if (MetaFoiAtingida(economiaAtual, valorMeta))
+            return "Meta atingida!";
+
+        return "Meta em andamento.";
+    }
+
+    public static bool MetaFoiAtingida(
+        decimal economiaAtual,
+        decimal valorMeta)
+    {
+        return economiaAtual >= valorMeta;
     }
 }

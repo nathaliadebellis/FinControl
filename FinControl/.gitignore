@@ -1,0 +1,15 @@
+﻿# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# Logs
+Logs/
+
+# Arquivos temporários
+*.user
+*.suo
+Data/transacoes.json
+Data/backup/

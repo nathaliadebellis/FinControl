@@ -1,3 +1,4 @@
+using FinControl.Models;
 using System;
 using System.Text.Json;
 
@@ -257,10 +258,22 @@ public static class GerenciadorErros
     }
 
     /// <summary>
+    /// Verifica se já existem backups
+    /// </summary>
+    public static bool ExisteBackup(string caminhoArquivo)
+    {
+        return ObterBackups(caminhoArquivo).Quantidade > 0;
+    }
+
+    /// <summary>
     /// Cria backup de um arquivo
     /// </summary>
-    public static bool CriarBackup(string caminhoArquivo)
+    public static bool CriarBackup(
+        string caminhoArquivo,
+        out string caminhoBackup)
     {
+        caminhoBackup = string.Empty;
+
         try
         {
             if (!File.Exists(caminhoArquivo))
@@ -272,19 +285,78 @@ public static class GerenciadorErros
 
             Directory.CreateDirectory(diretorioBackup);
 
-            string nomeBackup = Path.Combine(
+            caminhoBackup = Path.Combine(
                 diretorioBackup,
                 $"{Path.GetFileNameWithoutExtension(caminhoArquivo)}_" +
                 $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.json");
 
-            File.Copy(caminhoArquivo, nomeBackup, true);
+            File.Copy(caminhoArquivo, caminhoBackup, true);
 
-            _logger?.RegistrarInfo($"Backup criado: {nomeBackup}");
+            _logger?.RegistrarInfo($"Backup criado: {caminhoBackup}");
+
             return true;
         }
         catch (Exception ex)
         {
             _logger?.RegistrarAviso($"Falha ao criar backup: {ex.Message}");
+            caminhoBackup = string.Empty;
+            return false;
+        }
+    }
+
+
+    /// <summary>
+    /// Lista os backups
+    /// </summary>
+    public static BackupInfo ObterBackups(string caminhoArquivo)
+    {
+        string diretorio = Path.Combine(
+            Path.GetDirectoryName(caminhoArquivo)!,
+            "backup");
+
+        if (!Directory.Exists(diretorio))
+            return new BackupInfo();
+
+        return new BackupInfo
+        {
+            Backups = Directory
+                .GetFiles(diretorio, "*.json")
+                .Select(f => new FileInfo(f))
+                .OrderByDescending(f => f.LastWriteTime)
+                .ToList()
+        };
+    }
+
+    /// <summary>
+    /// Restaura backup
+    /// </summary>
+    public static bool RestaurarBackup(
+        string caminhoBackup,
+        string caminhoDestino)
+    {
+        if (File.Exists(caminhoDestino))
+        {
+            CriarBackup(caminhoDestino, out _);
+        }
+
+        try
+        {
+            if (!File.Exists(caminhoBackup))
+                return false;
+
+            File.Copy(caminhoBackup, caminhoDestino, true);
+
+            _logger?.RegistrarInfo(
+                $"Backup restaurado: {caminhoBackup}");
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger?.RegistrarErro(
+                ex,
+                "Erro ao restaurar backup");
+
             return false;
         }
     }
@@ -305,19 +377,47 @@ public static class GerenciadorErros
 
             DateTime dataLimite = DateTime.Now.AddDays(-diasRetencao);
 
-            foreach (var arquivo in Directory.GetFiles(diretorioBackup, "*.json"))
+            var backupInfo = ObterBackups(caminhoArquivo);
+
+            foreach (var backup in backupInfo.Backups)
             {
-                FileInfo info = new FileInfo(arquivo);
-                if (info.LastWriteTime < dataLimite)
+                if (backup.LastWriteTime < dataLimite)
                 {
-                    info.Delete();
-                    _logger?.RegistrarInfo($"Backup antigo removido: {arquivo}");
+                    backup.Delete();
                 }
             }
         }
         catch (Exception ex)
         {
             _logger?.RegistrarAviso($"Erro ao limpar backups antigos: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Exclui todos os backups
+    /// </summary>
+    public static bool ExcluirTodosBackups(string caminhoArquivo)
+    {
+        try
+        {
+            var backupInfo = ObterBackups(caminhoArquivo);
+
+            if (!backupInfo.Backups.Any())
+                return false;
+
+            foreach (var backup in backupInfo.Backups)
+            {
+                File.Delete(backup.FullName);
+            }
+
+            _logger?.RegistrarInfo("Todos os backups foram excluídos.");
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger?.RegistrarErro(ex, "Erro ao excluir backups.");
+            return false;
         }
     }
 
