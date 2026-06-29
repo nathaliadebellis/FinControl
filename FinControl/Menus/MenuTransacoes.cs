@@ -1,12 +1,17 @@
 ﻿using FinControl.Models;
 using FinControl.Services;
 using FinControl.Repositories;
-
 namespace FinControl.Menus;
 
-public static class MenuTransacoes
+public class MenuTransacoes
 {
-    public static void Exibir(List<Transacao> transacoes)
+    private readonly TransacaoService _service;
+
+    public MenuTransacoes(TransacaoService service)
+    {
+        _service = service;
+    }
+    public void Exibir()
     {
         bool continuar = true;
 
@@ -30,26 +35,23 @@ public static class MenuTransacoes
             switch (opcao)
             {
                 case "1":
-                    Adicionar(transacoes);
-                    Salvar(transacoes);
+                    Adicionar();
                     break;
 
                 case "2":
-                    Listar(transacoes);
+                    Listar();
                     break;
 
                 case "3":
-                    Buscar(transacoes);
+                    Buscar();
                     break;
 
                 case "4":
-                    Editar(transacoes);
-                    Salvar(transacoes);
+                    Editar();
                     break;
 
                 case "5":
-                    Excluir(transacoes);
-                    Salvar(transacoes);
+                    Excluir();
                     break;
 
                 case "0":
@@ -62,7 +64,7 @@ public static class MenuTransacoes
     // =========================
     // ADICIONAR
     // =========================
-    private static void Adicionar(List<Transacao> transacoes)
+    private void Adicionar()
     {
         string descricao =
             ValidadorEntrada.LerStringValida("Descrição:");
@@ -81,8 +83,7 @@ public static class MenuTransacoes
         decimal valor =
             ValidadorEntrada.LerDecimal("Valor:", 0.01m);
 
-        Transacao? transacao = TransacaoService.Criar(
-            transacoes,
+        Transacao? transacao = _service.Criar(
             descricao,
             categoria,
             tipo,
@@ -95,7 +96,7 @@ public static class MenuTransacoes
         }
         else
         {
-            TransacaoService.Adicionar(transacoes, transacao);
+            _service.Adicionar(transacao);
             ValidadorEntrada.MostrarSucesso("Transação adicionada!");
         }
 
@@ -105,9 +106,9 @@ public static class MenuTransacoes
     // =========================
     // LISTAR
     // =========================
-    private static void Listar(List<Transacao> transacoes)
+    private void Listar()
     {
-        var lista = TransacaoService.Listar(transacoes);
+        var lista = _service.Listar();
 
         if (!lista.Any())
         {
@@ -125,13 +126,13 @@ public static class MenuTransacoes
     // =========================
     // BUSCAR
     // =========================
-    private static void Buscar(List<Transacao> transacoes)
+    private void Buscar()
     {
         string termo =
             ValidadorEntrada.LerStringValida("Descrição:");
 
         var resultado =
-            TransacaoService.BuscarPorDescricao(transacoes, termo);
+            _service.BuscarPorDescricao(termo);
 
         if (!resultado.Any())
         {
@@ -149,11 +150,12 @@ public static class MenuTransacoes
     // =========================
     // EDITAR
     // =========================
-    private static void Editar(List<Transacao> transacoes)
+    private void Editar()
     {
         int id = ValidadorEntrada.LerInteiro("ID:");
 
-        var existente = transacoes.FirstOrDefault(t => t.Id == id);
+        var existente =
+    _service.BuscarPorId(id);
 
         if (existente is null)
         {
@@ -179,8 +181,7 @@ public static class MenuTransacoes
         decimal valor =
             ValidadorEntrada.LerDecimal("Novo valor:", 0.01m);
 
-        bool atualizado = TransacaoService.Editar(
-            transacoes,
+        bool atualizado = _service.Editar(
             id,
             descricao,
             categoria,
@@ -199,11 +200,12 @@ public static class MenuTransacoes
     // =========================
     // EXCLUIR
     // =========================
-    private static void Excluir(List<Transacao> transacoes)
+    private void Excluir()
     {
         int id = ValidadorEntrada.LerInteiro("ID:");
 
-        var existente = transacoes.FirstOrDefault(t => t.Id == id);
+        var existente =
+    _service.BuscarPorId(id);
 
         if (existente is null)
         {
@@ -212,7 +214,7 @@ public static class MenuTransacoes
             return;
         }
 
-        bool removido = TransacaoService.Excluir(transacoes, id);
+        bool removido = _service.Excluir(id);
 
         if (removido)
             ValidadorEntrada.MostrarSucesso("Removido com sucesso!");
@@ -225,7 +227,7 @@ public static class MenuTransacoes
     // =========================
     // CATEGORIA (REFATORADA)
     // =========================
-    private static string SelecionarCategoria(TipoTransacao tipo)
+    private string SelecionarCategoria(TipoTransacao tipo)
     {
         var categorias = tipo == TipoTransacao.Receita
             ? Categorias.Receitas
@@ -250,8 +252,5 @@ public static class MenuTransacoes
     // =========================
     // SALVAR CENTRALIZADO
     // =========================
-    private static void Salvar(List<Transacao> transacoes)
-    {
-        TransacaoRepository.Salvar(transacoes);
-    }
+
 }

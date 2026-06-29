@@ -1,10 +1,31 @@
 ﻿using FinControl.Models;
+using FinControl.Repositories.Interfaces;
 
 namespace FinControl.Services;
 
-public static class RelatorioService
+public class RelatorioService
 {
-    public static List<Transacao> ObterRelatorioGeral(
+    private readonly ITransacaoRepository _repository;
+    private readonly FinanceiroService _financeiroService;
+
+    public RelatorioService(
+        ITransacaoRepository repository,
+        FinanceiroService financeiroService)
+    {
+        _repository = repository;
+        _financeiroService = financeiroService;
+    }
+
+    // <summary>
+    // RELATÓRIO GERAL
+    // <summary>
+
+    public List<Transacao> ObterRelatorioGeral()
+    {
+        return ObterRelatorioGeral(_repository.Carregar());
+    }
+
+    public List<Transacao> ObterRelatorioGeral(
         List<Transacao> transacoes)
     {
         ArgumentNullException.ThrowIfNull(transacoes);
@@ -15,7 +36,21 @@ public static class RelatorioService
             .ToList();
     }
 
-    public static List<Transacao> ObterRelatorioMensal(
+    // <summary>
+    // RELATÓRIO MENSAL
+    // <summary>
+
+    public List<Transacao> ObterRelatorioMensal(
+        int mes,
+        int ano)
+    {
+        return ObterRelatorioMensal(
+            _repository.Carregar(),
+            mes,
+            ano);
+    }
+
+    public List<Transacao> ObterRelatorioMensal(
         List<Transacao> transacoes,
         int mes,
         int ano)
@@ -23,14 +58,27 @@ public static class RelatorioService
         ArgumentNullException.ThrowIfNull(transacoes);
 
         return transacoes
-            .Where(t => t.Data.Month == mes &&
-                        t.Data.Year == ano)
+            .Where(t =>
+                t.Data.Month == mes &&
+                t.Data.Year == ano)
             .OrderBy(t => t.Data)
             .ThenBy(t => t.Id)
             .ToList();
     }
 
-    public static List<Transacao> ObterRelatorioAnual(
+    // <summary>
+    // RELATÓRIO ANUAL
+    // <summary>
+
+    public List<Transacao> ObterRelatorioAnual(
+        int ano)
+    {
+        return ObterRelatorioAnual(
+            _repository.Carregar(),
+            ano);
+    }
+
+    public List<Transacao> ObterRelatorioAnual(
         List<Transacao> transacoes,
         int ano)
     {
@@ -43,7 +91,21 @@ public static class RelatorioService
             .ToList();
     }
 
-    public static List<Transacao> ObterRelatorioPeriodo(
+    // <summary>
+    // PERÍODO
+    // <summary>
+
+    public List<Transacao> ObterRelatorioPeriodo(
+        DateTime dataInicial,
+        DateTime dataFinal)
+    {
+        return ObterRelatorioPeriodo(
+            _repository.Carregar(),
+            dataInicial,
+            dataFinal);
+    }
+
+    public List<Transacao> ObterRelatorioPeriodo(
         List<Transacao> transacoes,
         DateTime dataInicial,
         DateTime dataFinal)
@@ -59,7 +121,17 @@ public static class RelatorioService
             .ToList();
     }
 
-    public static List<GastoCategoriaResumo> ObterGastosPorCategoria(
+    // <summary>
+    // GASTOS POR CATEGORIA
+    // <summary>
+
+    public List<GastoCategoriaResumo> ObterGastosPorCategoria()
+    {
+        return ObterGastosPorCategoria(
+            _repository.Carregar());
+    }
+
+    public List<GastoCategoriaResumo> ObterGastosPorCategoria(
         List<Transacao> transacoes)
     {
         ArgumentNullException.ThrowIfNull(transacoes);
@@ -84,11 +156,15 @@ public static class RelatorioService
             .ToList();
     }
 
-    public static (decimal receitas, decimal despesas, decimal saldo)
+    // <summary>
+    // RESUMO
+    // <summary>
+
+    public (decimal receitas, decimal despesas, decimal saldo)
         ObterResumo(List<Transacao> transacoes)
     {
         ArgumentNullException.ThrowIfNull(transacoes);
 
-        return FinanceiroService.CalcularResumo(transacoes);
+        return _financeiroService.CalcularResumo(transacoes);
     }
 }

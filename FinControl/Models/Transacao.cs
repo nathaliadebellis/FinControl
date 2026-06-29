@@ -15,12 +15,12 @@ public class Transacao
     /// <summary>
     /// Descrição ou observação da transação.
     /// </summary>
-    public string Descricao { get; set; }
+    public required string Descricao { get; set; }
 
     /// <summary>
     /// Categoria da transação (ex.: Alimentação, Transporte).
     /// </summary>
-    public string Categoria { get; set; }
+    public required string Categoria { get; set; }
 
     /// <summary>
     /// Tipo da transação: Receita ou Despesa.

@@ -1,10 +1,26 @@
 ﻿using FinControl.Models;
+using FinControl.Repositories.Interfaces;
 
 namespace FinControl.Services;
 
-public static class FinanceiroService
+public class FinanceiroService
 {
-    public static (decimal receitas, decimal despesas, decimal saldo)
+    private readonly ITransacaoRepository _repository;
+
+    public FinanceiroService(ITransacaoRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public (decimal receitas, decimal despesas, decimal saldo)
+    CalcularResumo()
+    {
+        var transacoes = _repository.Carregar();
+
+        return CalcularResumo(transacoes);
+    }
+
+    public (decimal receitas, decimal despesas, decimal saldo)
         CalcularResumo(List<Transacao> transacoes)
     {
         ArgumentNullException.ThrowIfNull(transacoes);
@@ -20,13 +36,17 @@ public static class FinanceiroService
         return (receitas, despesas, receitas - despesas);
     }
 
-    public static decimal CalcularSaldo(
-        List<Transacao> transacoes)
+    public decimal CalcularSaldo()
     {
-        return CalcularResumo(transacoes).saldo;
+        return CalcularResumo().saldo;
     }
 
-    public static decimal CalcularPercentualEconomia(
+    public decimal CalcularPercentualEconomia()
+    {
+        return CalcularPercentualEconomia(_repository.Carregar());
+    }
+
+    public decimal CalcularPercentualEconomia(
         List<Transacao> transacoes)
     {
         var (receitas, _, saldo) = CalcularResumo(transacoes);
@@ -36,7 +56,12 @@ public static class FinanceiroService
             : (saldo / receitas) * 100;
     }
 
-    public static int CalcularIndiceSaudeFinanceira(
+    public int CalcularIndiceSaudeFinanceira()
+    {
+        return CalcularIndiceSaudeFinanceira(_repository.Carregar());
+    }
+
+    public int CalcularIndiceSaudeFinanceira(
         List<Transacao> transacoes)
     {
         var (receitas, despesas, saldo) =
@@ -57,7 +82,7 @@ public static class FinanceiroService
         return Math.Clamp(indice, 0, 100);
     }
 
-    public static string ObterStatusSaudeFinanceira(
+    public string ObterStatusSaudeFinanceira(
         int indice)
     {
         if (indice >= 90)
@@ -72,7 +97,12 @@ public static class FinanceiroService
         return "Crítica";
     }
 
-    public static string GerarAnaliseFinanceira(
+    public string GerarAnaliseFinanceira()
+    {
+        return GerarAnaliseFinanceira(_repository.Carregar());
+    }
+
+    public string GerarAnaliseFinanceira(
         List<Transacao> transacoes)
     {
         var (receitas, _, saldo) =
@@ -96,7 +126,7 @@ public static class FinanceiroService
         return "Sua margem de economia está baixa. Revise seus gastos.";
     }
 
-    private static List<GastoCategoriaResumo>
+    private List<GastoCategoriaResumo>
         CalcularGastosPorCategoria(
             List<Transacao> transacoes,
             decimal totalDespesas)
@@ -116,7 +146,7 @@ public static class FinanceiroService
             .ToList();
     }
 
-    private static Transacao? ObterMaiorReceita(
+    private Transacao? ObterMaiorReceita(
         List<Transacao> transacoes)
     {
         return transacoes
@@ -125,7 +155,7 @@ public static class FinanceiroService
             .FirstOrDefault();
     }
 
-    private static Transacao? ObterMaiorDespesa(
+    private Transacao? ObterMaiorDespesa(
         List<Transacao> transacoes)
     {
         return transacoes
@@ -134,7 +164,12 @@ public static class FinanceiroService
             .FirstOrDefault();
     }
 
-    public static DashboardResumo GerarDashboardResumo(
+    public DashboardResumo GerarDashboardResumo()
+    {
+        return GerarDashboardResumo(_repository.Carregar());
+    }
+
+    public DashboardResumo GerarDashboardResumo(
         List<Transacao> transacoes)
     {
         ArgumentNullException.ThrowIfNull(transacoes);
@@ -163,6 +198,7 @@ public static class FinanceiroService
                 CalcularPercentualEconomia(transacoes),
 
             IndiceSaudeFinanceira = indice,
+
             StatusSaudeFinanceira =
                 ObterStatusSaudeFinanceira(indice),
 

@@ -3,9 +3,23 @@ using FinControl.Services;
 
 namespace FinControl.Menus;
 
-public static class MenuPlanejamentoFinanceiro
+public class MenuPlanejamentoFinanceiro
 {
-    public static void Exibir(List<Transacao> transacoes)
+    private readonly OrcamentoService _orcamentoService;
+    private readonly MetaEconomiaService _metaEconomiaService;
+    private readonly FinanceiroService _financeiroService;
+
+    public MenuPlanejamentoFinanceiro(
+        OrcamentoService orcamentoService,
+        MetaEconomiaService metaEconomiaService,
+        FinanceiroService financeiroService)
+    {
+        _orcamentoService = orcamentoService;
+        _metaEconomiaService = metaEconomiaService;
+        _financeiroService = financeiroService;
+    }
+
+    public void Exibir()
     {
         bool continuar = true;
 
@@ -32,7 +46,7 @@ public static class MenuPlanejamentoFinanceiro
             {
                 case "1":
                     {
-                        var orcamentos = OrcamentoService.ListarOrcamentos();
+                        var orcamentos = _orcamentoService.ListarOrcamentos();
 
                         if (!orcamentos.Any())
                         {
@@ -71,7 +85,7 @@ public static class MenuPlanejamentoFinanceiro
                             "Limite mensal:",
                             0.01m);
 
-                        OrcamentoService.DefinirOuAtualizarOrcamento(
+                        _orcamentoService.DefinirOuAtualizarOrcamento(
                             categoria,
                             limite);
 
@@ -83,7 +97,7 @@ public static class MenuPlanejamentoFinanceiro
 
                 case "3":
                     {
-                        var orcamentos = OrcamentoService.ListarOrcamentos();
+                        var orcamentos = _orcamentoService.ListarOrcamentos();
 
                         if (!orcamentos.Any())
                         {
@@ -104,7 +118,7 @@ public static class MenuPlanejamentoFinanceiro
                             1,
                             orcamentos.Count);
 
-                        OrcamentoService.RemoverOrcamento(
+                        _orcamentoService.RemoverOrcamento(
                             orcamentos[opcaoRemover - 1].Categoria);
 
                         ValidadorEntrada.MostrarSucesso("Orçamento removido com sucesso!");
@@ -115,7 +129,7 @@ public static class MenuPlanejamentoFinanceiro
 
                 case "4":
                     {
-                        var alertas = OrcamentoService.VerificarAlertas(transacoes);
+                        var alertas = _orcamentoService.VerificarAlertas();
 
                         if (!alertas.Any())
                         {
@@ -139,7 +153,7 @@ public static class MenuPlanejamentoFinanceiro
                             "Meta de economia:",
                             0.01m);
 
-                        MetaEconomiaService.DefinirMeta(meta);
+                        _metaEconomiaService.DefinirMeta(meta);
 
                         ValidadorEntrada.MostrarSucesso("Meta definida com sucesso!");
 
@@ -149,7 +163,7 @@ public static class MenuPlanejamentoFinanceiro
 
                 case "6":
                     {
-                        var meta = MetaEconomiaService.ObterMeta();
+                        var meta = _metaEconomiaService.ObterMeta();
 
                         if (meta.ValorMeta <= 0)
                         {
@@ -158,13 +172,13 @@ public static class MenuPlanejamentoFinanceiro
                             break;
                         }
 
-                        decimal economiaAtual = FinanceiroService.CalcularSaldo(transacoes);
+                        decimal economiaAtual = _financeiroService.CalcularSaldo();
 
-                        decimal progresso = MetaEconomiaService.CalcularProgresso(
+                        decimal progresso = _metaEconomiaService.CalcularProgresso(
                             economiaAtual,
                             meta.ValorMeta);
 
-                        decimal restante = MetaEconomiaService.CalcularValorRestante(
+                        decimal restante = _metaEconomiaService.CalcularValorRestante(
                             economiaAtual,
                             meta.ValorMeta);
 
@@ -172,9 +186,9 @@ public static class MenuPlanejamentoFinanceiro
                         Console.WriteLine($"Meta definida:      R$ {meta.ValorMeta:F2}");
                         Console.WriteLine($"Economia atual:     R$ {economiaAtual:F2}");
                         Console.WriteLine($"Progresso:          {progresso:F2}%");
-                        Console.WriteLine($"Status:             {MetaEconomiaService.ObterStatusMeta(economiaAtual, meta.ValorMeta)}");
+                        Console.WriteLine($"Status:             {_metaEconomiaService.ObterStatusMeta(economiaAtual, meta.ValorMeta)}");
 
-                        if (!MetaEconomiaService.MetaFoiAtingida(economiaAtual, meta.ValorMeta))
+                        if (!_metaEconomiaService.MetaFoiAtingida(economiaAtual, meta.ValorMeta))
                         {
                             Console.WriteLine($"Faltam:             R$ {restante:F2}");
                         }
@@ -185,7 +199,7 @@ public static class MenuPlanejamentoFinanceiro
 
                 case "7":
                     {
-                        MetaEconomiaService.RemoverMeta();
+                        _metaEconomiaService.RemoverMeta();
 
                         ValidadorEntrada.MostrarSucesso("Meta removida com sucesso!");
 

@@ -1,31 +1,43 @@
-﻿using FinControl.Models;
+﻿using FinControl.Interfaces;
+using FinControl.Models;
 using FinControl.Repositories;
 
 namespace FinControl.Services;
 
-public static class MetaEconomiaService
+public class MetaEconomiaService
 {
-    public static void DefinirMeta(decimal valorMeta)
+    private readonly IMetaEconomiaRepository _repository;
+
+    public MetaEconomiaService(IMetaEconomiaRepository repository)
     {
+        _repository = repository;
+    }
+
+    public void DefinirMeta(decimal valorMeta)
+    {
+        if (valorMeta <= 0)
+            throw new ArgumentException(
+                "A meta deve ser maior que zero.");
+
         var meta = new MetaEconomia
         {
             ValorMeta = valorMeta
         };
 
-        MetaEconomiaRepository.Salvar(meta);
+        _repository.Salvar(meta);
     }
 
-    public static MetaEconomia ObterMeta()
+    public MetaEconomia ObterMeta()
     {
-        return MetaEconomiaRepository.Carregar();
+        return _repository.Carregar();
     }
 
-    public static void RemoverMeta()
+    public void RemoverMeta()
     {
-        MetaEconomiaRepository.Remover();
+        _repository.Remover();
     }
 
-    public static decimal CalcularProgresso(
+    public decimal CalcularProgresso(
         decimal economiaAtual,
         decimal valorMeta)
     {
@@ -35,16 +47,16 @@ public static class MetaEconomiaService
         return (economiaAtual / valorMeta) * 100;
     }
 
-    public static decimal CalcularValorRestante(
-    decimal economiaAtual,
-    decimal valorMeta)
+    public decimal CalcularValorRestante(
+        decimal economiaAtual,
+        decimal valorMeta)
     {
         return Math.Max(0, valorMeta - economiaAtual);
     }
 
-    public static string ObterStatusMeta(
-    decimal economiaAtual,
-    decimal valorMeta)
+    public string ObterStatusMeta(
+        decimal economiaAtual,
+        decimal valorMeta)
     {
         if (valorMeta <= 0)
             return "Nenhuma meta definida.";
@@ -55,7 +67,7 @@ public static class MetaEconomiaService
         return "Meta em andamento.";
     }
 
-    public static bool MetaFoiAtingida(
+    public bool MetaFoiAtingida(
         decimal economiaAtual,
         decimal valorMeta)
     {

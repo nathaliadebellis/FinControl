@@ -1,10 +1,18 @@
 ﻿using FinControl.Models;
+using FinControl.Repositories.Interfaces;
 
 namespace FinControl.Services;
 
-public static class TransacaoService
+public class TransacaoService
 {
-    public static int ObterProximoId(List<Transacao> transacoes)
+    private readonly ITransacaoRepository _repository;
+
+    public TransacaoService(ITransacaoRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public int ObterProximoId(List<Transacao> transacoes)
     {
         ArgumentNullException.ThrowIfNull(transacoes);
 
@@ -13,7 +21,7 @@ public static class TransacaoService
             : transacoes.Max(t => t.Id) + 1;
     }
 
-    public static bool Validar(
+    public bool Validar(
         string descricao,
         string categoria,
         decimal valor,
@@ -41,14 +49,15 @@ public static class TransacaoService
         return true;
     }
 
-    public static Transacao? Criar(
-        List<Transacao> transacoes,
-        string descricao,
-        string categoria,
-        TipoTransacao tipo,
-        decimal valor,
-        out string mensagemErro)
+    public Transacao? Criar(
+    string descricao,
+    string categoria,
+    TipoTransacao tipo,
+    decimal valor,
+    out string mensagemErro)
     {
+        var transacoes = _repository.Carregar();
+
         ArgumentNullException.ThrowIfNull(transacoes);
 
         descricao = descricao.Trim();
@@ -68,53 +77,46 @@ public static class TransacaoService
         };
     }
 
-    public static bool Adicionar(
-        List<Transacao> transacoes,
-        Transacao? transacao)
+    public bool Adicionar(Transacao transacao)
     {
+        var transacoes = _repository.Carregar();
         ArgumentNullException.ThrowIfNull(transacoes);
 
         if (transacao is null)
             return false;
 
         transacoes.Add(transacao);
+        _repository.Salvar(transacoes);
         return true;
     }
 
-    public static List<Transacao> Listar(List<Transacao> transacoes)
+    public List<Transacao> Listar()
     {
-        ArgumentNullException.ThrowIfNull(transacoes);
-
-        return transacoes
+        return _repository
+            .Carregar()
             .OrderByDescending(t => t.Data)
             .ThenByDescending(t => t.Id)
             .ToList();
     }
 
-    public static Transacao? BuscarPorId(
-        List<Transacao> transacoes,
-        int id)
+    public Transacao? BuscarPorId(int id)
     {
-        ArgumentNullException.ThrowIfNull(transacoes);
-
-        return transacoes.FirstOrDefault(t => t.Id == id);
+        return _repository
+            .Carregar()
+            .FirstOrDefault(t => t.Id == id);
     }
 
-    public static List<Transacao> BuscarPorDescricao(
-    List<Transacao> transacoes,
-    string descricao)
+    public List<Transacao> BuscarPorDescricao(string descricao)
     {
-        ArgumentNullException.ThrowIfNull(transacoes);
-
-        return transacoes
+        return _repository
+            .Carregar()
             .Where(t => t.Descricao.Contains(
                 descricao.Trim(),
                 StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
 
-    public static bool Editar(
-        List<Transacao> transacoes,
+    public bool Editar(
         int id,
         string descricao,
         string categoria,
@@ -122,12 +124,13 @@ public static class TransacaoService
         decimal valor,
         out string mensagemErro)
     {
+        var transacoes = _repository.Carregar();
         ArgumentNullException.ThrowIfNull(transacoes);
 
         descricao = descricao.Trim();
         categoria = categoria.Trim();
 
-        var transacao = BuscarPorId(transacoes, id);
+        var transacao = BuscarPorId(id);
 
         if (transacao is null)
         {
@@ -142,26 +145,29 @@ public static class TransacaoService
         transacao.Categoria = categoria;
         transacao.Tipo = tipo;
         transacao.Valor = valor;
+        _repository.Salvar(transacoes);
 
         mensagemErro = string.Empty;
         return true;
     }
 
-    public static bool Excluir(
-        List<Transacao> transacoes,
-        int id)
-    {
-        ArgumentNullException.ThrowIfNull(transacoes);
+public bool Excluir(int id)
+{
+    var transacoes = _repository.Carregar();
 
-        var transacao = BuscarPorId(transacoes, id);
+    var transacao = transacoes.FirstOrDefault(t => t.Id == id);
 
-        if (transacao is null)
-            return false;
+    if (transacao is null)
+        return false;
 
-        return transacoes.Remove(transacao);
-    }
+    transacoes.Remove(transacao);
 
-    public static List<Transacao> BuscarPorCategoria(
+    _repository.Salvar(transacoes);
+
+    return true;
+}
+
+    public List<Transacao> BuscarPorCategoria(
         List<Transacao> transacoes,
         string categoria)
     {
@@ -174,7 +180,7 @@ public static class TransacaoService
             .ToList();
     }
 
-    public static List<Transacao> BuscarPorTipo(
+    public List<Transacao> BuscarPorTipo(
         List<Transacao> transacoes,
         TipoTransacao tipo)
     {

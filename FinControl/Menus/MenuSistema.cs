@@ -2,15 +2,17 @@
 
 namespace FinControl.Menus;
 
-public static class MenuSistema
+public class MenuSistema
 {
-    public static void Exibir()
-    {
-        string caminhoArquivo = Path.Combine(
-    AppDomain.CurrentDomain.BaseDirectory,
-    "Data",
-    "transacoes.json");
+    private readonly SistemaService _service;
 
+    public MenuSistema(SistemaService service)
+    {
+        _service = service;
+    }
+
+    public void Exibir()
+    {
         bool continuar = true;
 
         while (continuar)
@@ -35,8 +37,7 @@ public static class MenuSistema
             {
                 case "1":
                     {
-                        bool sucesso = GerenciadorErros.CriarBackup(
-                            caminhoArquivo,
+                        bool sucesso = _service.CriarBackup(
                             out string backup);
 
                         if (sucesso)
@@ -56,7 +57,7 @@ public static class MenuSistema
 
                 case "2":
                     {
-                        var info = GerenciadorErros.ObterBackups(caminhoArquivo);
+                        var info = _service.ObterBackups();
 
                         Console.WriteLine("===== BACKUPS =====");
                         Console.WriteLine($"Quantidade: {info.Quantidade}");
@@ -92,7 +93,7 @@ public static class MenuSistema
 
                 case "3":
                     {
-                        var info = GerenciadorErros.ObterBackups(caminhoArquivo);
+                        var info = _service.ObterBackups();
 
                         if (!info.Backups.Any())
                         {
@@ -114,9 +115,8 @@ public static class MenuSistema
                             1,
                             info.Backups.Count);
 
-                        bool sucesso = GerenciadorErros.RestaurarBackup(
-                            info.Backups[opcaoBackup - 1].FullName,
-                            caminhoArquivo);
+                        bool sucesso = _service.RestaurarBackup(
+                            info.Backups[opcaoBackup - 1].FullName);
 
                         if (sucesso)
                         {
@@ -138,9 +138,7 @@ public static class MenuSistema
                             1,
                             365);
 
-                        GerenciadorErros.LimparBackupsAntigos(
-                            caminhoArquivo,
-                            dias);
+                       _service.LimparBackupsAntigos(dias);
 
                         ValidadorEntrada.MostrarInfo(
                             "Limpeza de backups concluída.");
@@ -162,8 +160,7 @@ public static class MenuSistema
                             break;
                         }
 
-                        bool sucesso = GerenciadorErros.ExcluirTodosBackups(
-                            caminhoArquivo);
+                        bool sucesso = _service.ExcluirTodosBackups();
 
                         if (sucesso)
                             ValidadorEntrada.MostrarSucesso(
@@ -178,7 +175,7 @@ public static class MenuSistema
 
                 case "6":
                     {
-                        GerenciadorErros.ExibirRelatorioDErros();
+                        _service.ExibirRelatorioErros();
                         break;
                     }
 

@@ -3,9 +3,20 @@ using FinControl.Services;
 
 namespace FinControl.Menus;
 
-public static class MenuVisaoGeral
+public class MenuVisaoGeral
 {
-    public static void Exibir(List<Transacao> transacoes)
+    private readonly FinanceiroService _financeiroService;
+    private readonly MenuRelatorios _menuRelatorios;
+
+    public MenuVisaoGeral(
+        FinanceiroService financeiroService,
+        MenuRelatorios menuRelatorios)
+    {
+        _financeiroService = financeiroService;
+        _menuRelatorios = menuRelatorios;
+    }
+
+    public void Exibir()
     {
         bool continuar = true;
 
@@ -25,19 +36,16 @@ public static class MenuVisaoGeral
             switch (opcao)
             {
                 case "1":
-                    ExibirDashboard(transacoes);
+                    ExibirDashboard();
                     break;
 
                 case "2":
                     var (_, _, saldo) =
-                        FinanceiroService.CalcularResumo(transacoes);
-
-                    Console.WriteLine($"Saldo: R$ {saldo:F2}");
-                    Formatting.AguardarRetorno();
+                        _financeiroService.CalcularResumo();
                     break;
 
                 case "3":
-                    MenuRelatorios.Exibir(transacoes);
+                    _menuRelatorios.Exibir();
                     break;
 
                 case "0":
@@ -47,10 +55,10 @@ public static class MenuVisaoGeral
         }
     }
 
-    private static void ExibirDashboard(List<Transacao> transacoes)
+    private void ExibirDashboard()
     {
         DashboardResumo resumo =
-            FinanceiroService.GerarDashboardResumo(transacoes);
+            _financeiroService.GerarDashboardResumo();
 
         Console.Clear();
         Console.WriteLine(DashboardService.GerarTexto(resumo));

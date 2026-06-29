@@ -1,23 +1,72 @@
-﻿using FinControl.Core;
+﻿using FinControl.Interfaces;
 using FinControl.Menus;
 using FinControl.Models;
 using FinControl.Repositories;
+using FinControl.Repositories.Interfaces;
 using FinControl.Services;
 
 // Inicialização
 GerenciadorErros.Inicializar();
 
-// Carrega os dados
-List<Transacao> transacoes = TransacaoRepository.Carregar();
-List<OrcamentoCategoria> orcamentos = OrcamentoRepository.Carregar();
+// Repositórios
+ITransacaoRepository transacaoRepository =
+    new JsonTransacaoRepository();
+
+IOrcamentoRepository orcamentoRepository =
+    new JsonOrcamentoRepository();
+
+IMetaEconomiaRepository metaRepository =
+    new JsonMetaEconomiaRepository();
+
+// Serviços
+var transacaoService =
+    new TransacaoService(transacaoRepository);
+
+var orcamentoService =
+    new OrcamentoService(
+        orcamentoRepository,
+        transacaoService);
+
+var financeiroService =
+    new FinanceiroService(transacaoRepository);
+
+var relatorioService =
+    new RelatorioService(
+        transacaoRepository,
+        financeiroService);
+
+var menuRelatorios =
+    new MenuRelatorios(relatorioService);
+
+var menuVisaoGeral =
+    new MenuVisaoGeral(
+        financeiroService,
+        menuRelatorios);
+
+var metaService =
+    new MetaEconomiaService(metaRepository);
+
+var sistemaService = new SistemaService();
+
+var menuSistema = new MenuSistema(sistemaService);
+
+var menuTransacoes = new MenuTransacoes(transacaoService);
+
+var menuPlanejamentoFinanceiro =
+    new MenuPlanejamentoFinanceiro(
+        orcamentoService,
+        metaService,
+        financeiroService);
+
+// Carregar dados
+List<Transacao> transacoes =
+    transacaoRepository.Carregar();
+
+List<OrcamentoCategoria> orcamentos =
+    orcamentoRepository.Carregar();
 
 // Limpeza automática de backups antigos
-GerenciadorErros.LimparBackupsAntigos(
-    Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory,
-        "Data",
-        "transacoes.json"),
-    30);
+sistemaService.LimparBackupsAntigos(30);
 
 bool executarSistema = true;
 
@@ -40,21 +89,19 @@ while (executarSistema)
     switch (opcao)
     {
         case "1":
-            MenuVisaoGeral.Exibir(transacoes);
+            menuVisaoGeral.Exibir();
             break;
 
         case "2":
-            MenuTransacoes.Exibir(transacoes);
-            TransacaoRepository.Salvar(transacoes);
+            menuTransacoes.Exibir();
             break;
 
         case "3":
-            MenuPlanejamentoFinanceiro.Exibir(transacoes);
-            OrcamentoRepository.Salvar(orcamentos);
+            menuPlanejamentoFinanceiro.Exibir();
             break;
 
         case "4":
-            MenuSistema.Exibir();
+            menuSistema.Exibir();
             break;
 
         case "0":

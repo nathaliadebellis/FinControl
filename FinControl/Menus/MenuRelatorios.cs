@@ -3,10 +3,17 @@ using FinControl.Services;
 
 namespace FinControl.Menus;
 
-public static class MenuRelatorios
+public class MenuRelatorios
 {
-    public static void Exibir(List<Transacao> transacoes)
+    private readonly RelatorioService _service;
+
+    public MenuRelatorios(RelatorioService service)
     {
+        _service = service;
+    }
+    public void Exibir()
+    {
+
         bool continuar = true;
 
         while (continuar)
@@ -29,7 +36,7 @@ public static class MenuRelatorios
             {
                 case "1":
                     ExibirRelatorio(
-                        RelatorioService.ObterRelatorioGeral(transacoes));
+                        _service.ObterRelatorioGeral());
                     break;
 
                 case "2":
@@ -45,8 +52,7 @@ public static class MenuRelatorios
                             DateTime.Now.Year);
 
                         ExibirRelatorio(
-                            RelatorioService.ObterRelatorioMensal(
-                                transacoes,
+                            _service.ObterRelatorioMensal(
                                 mes,
                                 ano));
                         break;
@@ -60,16 +66,14 @@ public static class MenuRelatorios
                             DateTime.Now.Year);
 
                         ExibirRelatorio(
-                            RelatorioService.ObterRelatorioAnual(
-                                transacoes,
+                            _service.ObterRelatorioAnual(
                                 ano));
                         break;
                     }
 
                 case "4":
                     ExibirCategorias(
-                        RelatorioService.ObterGastosPorCategoria(
-                            transacoes));
+                        _service.ObterGastosPorCategoria());
                     break;
 
                 case "0":
@@ -84,7 +88,7 @@ public static class MenuRelatorios
         }
     }
 
-    private static void ExibirRelatorio(
+    private void ExibirRelatorio(
         List<Transacao> transacoes)
     {
         if (!transacoes.Any())
@@ -110,14 +114,14 @@ public static class MenuRelatorios
         Console.WriteLine();
 
         var (receitas, despesas, saldo) =
-            RelatorioService.ObterResumo(transacoes);
+            _service.ObterResumo(transacoes);
 
         Console.WriteLine($"Total de Receitas : R$ {receitas:F2}");
         Console.WriteLine($"Total de Despesas : R$ {despesas:F2}");
         Console.WriteLine($"Saldo             : R$ {saldo:F2}");
     }
 
-    private static void ExibirCategorias(
+    private void ExibirCategorias(
         List<GastoCategoriaResumo> categorias)
     {
         if (!categorias.Any())
