@@ -2,7 +2,7 @@ using FinControl.Models;
 using System;
 using System.Text.Json;
 
-namespace FinControl.Services;
+namespace FinControl.Utils;
 
 /// <summary>
 /// Gerenciador centralizado de erros e recuperação

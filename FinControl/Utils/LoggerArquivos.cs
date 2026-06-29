@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace FinControl.Services;
+namespace FinControl.Utils;
 
 /// <summary>
 /// Sistema de logging baseado em arquivos que registra mensagens de erro, informação e aviso em um arquivo de log rotativo.

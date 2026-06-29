@@ -1,6 +1,6 @@
 using FinControl.Models;
 
-namespace FinControl.Services;
+namespace FinControl.Utils;
 
 /// <summary>
 /// Funções auxiliares para manter a formatação e a saída consistentes entre as telas da aplicação.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FinControl.Services;
+namespace FinControl.Utils;
 
 /// <summary>
 /// Métodos auxiliares para validação e leitura da entrada do usuário no console.

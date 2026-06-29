@@ -4,6 +4,7 @@ using FinControl.Models;
 using FinControl.Repositories;
 using FinControl.Repositories.Interfaces;
 using FinControl.Services;
+using FinControl.Utils;
 
 // Inicialização
 GerenciadorErros.Inicializar();

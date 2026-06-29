@@ -1,6 +1,6 @@
 using System;
 
-namespace FinControl.Services;
+namespace FinControl.Utils;
 
 /// <summary>
 /// Exceção base para operações do FinControl
